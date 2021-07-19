@@ -1,0 +1,3 @@
+# @package dataset
+defaults:
+  - /dataset/default
