@@ -10,12 +10,6 @@ repos:
         args: [--maxkb=15000]
       - id: check-yaml
 
-  - repo: https://github.com/ambv/black
-    rev: stable
-    hooks:
-      - id: black
-        language_version: python
-
   - repo: https://github.com/humitos/mirrors-autoflake.git
     rev: v1.3
     hooks:
@@ -27,6 +21,13 @@ repos:
             '--ignore-init-module-imports',
             '--imports=torch,torch_geometric,torch_scatter,torch_cluster,numpy,sklearn,scipy,torch_sparse,torch_points_kernels',
           ]
+
+  - repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+      - id: black
+        language_version: python
+
   - repo: https://github.com/kynan/nbstripout
     rev: master
     hooks:
