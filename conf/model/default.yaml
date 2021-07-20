@@ -1,0 +1,6 @@
+# By default we turn off recursive instantiation, allowing the user to instantiate themselves at the appropriate times.
+_recursive_: false
+
+_target_: torch_points3d.model.base_model.PointCloudBaseModel
+optimizer: ${optimizer}
+scheduler: ${scheduler}

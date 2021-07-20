@@ -1,6 +1,6 @@
 # @package dataset
 defaults:
   - segmentation/default
-_target_: torch_points3d.dataset.s3dis1x1
+_target_: torch_points3d.dataset.s3dis1x1.s3dis_data_module
 cfg:
   fold: 5
