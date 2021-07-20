@@ -2,6 +2,7 @@ defaults: # loads default configs
   - dataset: ???
   - optimizer: sgd
   # - scheduler: linear_schedule_with_warmup
+  - model: ???
   - training: default
   - trainer: default
 
