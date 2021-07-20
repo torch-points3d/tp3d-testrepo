@@ -4,72 +4,40 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.utilities.distributed import rank_zero_info
+from hydra.utils.instantiate as hydra_instantiate
 
-from lightning_transformers.core import TaskTransformer, TransformerDataModule
-from lightning_transformers.core.config import TaskConfig, TrainerConfig, TransformerDataConfig
-from lightning_transformers.core.instantiator import HydraInstantiator, Instantiator
-from lightning_transformers.core.nlp.config import HFTokenizerConfig
-from lightning_transformers.core.utils import set_ignore_warnings
+from torch_points3d.datasets.dataset_factory import instantiate_dataset, convert_to_lightning_data_module
+from torch_points3d.datasets.dataset_factory import instantiate_dataset
 
 
-def run(
-    instantiator: Instantiator,
-    ignore_warnings: bool = True,
-    run_test_after_fit: bool = True,
-    dataset: TransformerDataConfig = TransformerDataConfig(),
-    task: TaskConfig = TaskConfig(),
-    trainer: TrainerConfig = TrainerConfig(),
-    tokenizer: Optional[HFTokenizerConfig] = None,
-    logger: Optional[Any] = None,
-) -> None:
-    if ignore_warnings:
-        set_ignore_warnings()
+class LitTrainer:
+    def __init__(self, cfg: DictConfig):
+        self._cfg = cfg
 
-    data_module_kwargs = {}
-    if tokenizer is not None:
-        data_module_kwargs["tokenizer"] = tokenizer
+    def instantiate_trainer(self):
+        trainer = hydra_instantiate(self._cfg.trainer)
+        return trainer
 
-    data_module: TransformerDataModule = instantiator.data_module(dataset, **data_module_kwargs)
-    if data_module is None:
-        raise ValueError("No dataset found. Hydra hint: did you set `dataset=...`?")
-    if not isinstance(data_module, LightningDataModule):
-        raise ValueError(
-            "The instantiator did not return a DataModule instance."
-            " Hydra hint: is `dataset._target_` defined?`"
+    def instantiate_dataset_and_model(self):
+        dataset: BaseDataset = instantiate_dataset(self._cfg.data)
+        model: BaseModel = instantiate_model(copy.deepcopy(cfg), dataset) 
+        model.instantiate_optimizers(cfg) # we will change it and instantiate the optimizers separately
+        model.set_pretrained_weights()
+        dataset.create_dataloaders(
+            cfg.training.batch_size,
+            cfg.training.shuffle,
+            cfg.training.num_workers,
+            model.conv_type == "PARTIAL_DENSE" and getattr(cfg.training, "precompute_multi_scale", False),
         )
-    data_module.setup("fit")
+        data_module = convert_to_lightning_data_module(dataset)
+        return model, data_module
 
-    model: TaskTransformer = instantiator.model(task, model_data_kwargs=getattr(data_module, "model_data_kwargs", None))
-    trainer = instantiator.trainer(
-        trainer,
-        logger=logger,
-    )
+    def train(self):
 
-    trainer.fit(model, datamodule=data_module)
-    if run_test_after_fit:
-        trainer.test(model, datamodule=data_module)
+        
+        # model.tracker_options = cfg.get("tracker_options", {})
+        # model.trackers = data_module.trackers
+        model, data_module = self.instantiate_dataset_and_model()
+        trainer = self.instantiate_trainer()
+        trainer.fit(model, data_module)
 
-
-def main(cfg: DictConfig) -> None:
-    rank_zero_info(OmegaConf.to_yaml(cfg))
-    instantiator = HydraInstantiator()
-    logger = instantiator.logger(cfg)
-    run(
-        instantiator,
-        ignore_warnings=cfg.get("ignore_warnings"),
-        run_test_after_fit=cfg.get("training").get("run_test_after_fit"),
-        dataset=cfg.get("dataset"),
-        tokenizer=cfg.get("tokenizer"),
-        task=cfg.get("task"),
-        trainer=cfg.get("trainer"),
-        logger=logger,
-    )
-
-
-@hydra.main(config_path="../../conf", config_name="config")
-def hydra_entry(cfg: DictConfig) -> None:
-    main(cfg)
-
-
-if __name__ == "__main__":
-    hydra_entry()
