@@ -4,8 +4,6 @@ defaults:
   - data: ???
   - training: default
   - trainer: default
-  - lr_scheduler: exponential
-  - optimizer: sgd
 
 job_name: benchmark
 model_name: ???
