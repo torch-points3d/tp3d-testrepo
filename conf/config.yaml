@@ -2,6 +2,7 @@ defaults:
   - task: ???
   - models: ???
   - data: ???
+  - tracker: ???
   - training: default
   - trainer: default
   - lr_scheduler: exponential
