@@ -1,8 +1,6 @@
 # @package dataset
 defaults:
   - segmentation/default
-_target_: lightning_transformers.task.nlp.multiple_choice.RaceMultipleChoiceDataModule
+_target_: torch_points3d.dataset.s3dis1x1
 cfg:
-  dataset_name: race
-  dataset_config_name: 'all'
-  padding: False
+  fold: 5

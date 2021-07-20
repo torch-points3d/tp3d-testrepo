@@ -1,0 +1,5 @@
+lr: 5e-5
+
+# read in dataset
+batch_size: 16
+num_workers: 16
