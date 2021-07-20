@@ -96,7 +96,6 @@ class PointCloudBaseModel(pl.LightningModule):
         This is called on fit start to have access to the data module,
         and initialize any data specific metrics.
         """
-        pass
 
     def on_save_checkpoint(self, checkpoint: Dict[str, Any]):
         # Save tokenizer from datamodule for predictions

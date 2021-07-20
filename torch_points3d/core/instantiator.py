@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Optional, TYPE_CHECKING
 
 import hydra
 import pytorch_lightning as pl
