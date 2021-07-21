@@ -25,7 +25,7 @@ class TestAPIModel(unittest.TestCase):
         coords = torch.round(pos * 10000)
         x = torch.ones(1000, 1)
         batch = torch.zeros(1000).long()
-        y = torch.randint(0, 10, (1000, ))
+        y = torch.randint(0, 10, (1000,))
         data = Batch(pos=pos, x=x, batch=batch, y=y, coords=coords)
         model.set_input(data)
         model.forward()

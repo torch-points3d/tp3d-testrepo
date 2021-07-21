@@ -14,6 +14,8 @@ from torch_points3d.core.common_modules import FastBatchNorm1d, Seq
 log = logging.getLogger(__name__)
 
 IGNORE_LABEL: int = -1
+
+
 class APIModel(nn.Module):
     def __init__(self, option, option_dataset):
         # call the initialization method of UnetBasedModel
