@@ -6,9 +6,9 @@ cfg:
   num_workers: ${training.num_workers}
   dataroot: data
 
-  common_transform: None
-  aug_transform: None
-  pre_transform: None
+  common_transform:
+  aug_transform:
+  pre_transform:
 
   val_transform: "${dataset.cfg.common_transform}"
   test_transform: "${dataset.cfg.val_transform}"
