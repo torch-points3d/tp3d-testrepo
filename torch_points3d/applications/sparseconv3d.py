@@ -8,8 +8,8 @@ from torch_geometric.data import Batch
 from torch_points3d.applications.modelfactory import ModelFactory
 import torch_points3d.modules.SparseConv3d as sp3d
 from torch_points3d.modules.SparseConv3d.modules import *
-from torch_points3d.core.base_conv.message_passing import *
-from torch_points3d.core.base_conv.partial_dense import *
+# from torch_points3d.core.base_conv.message_passing import *
+# from torch_points3d.core.base_conv.partial_dense import *
 from torch_points3d.model.base_architectures.unet import UnwrappedUnetBasedModel
 from torch_points3d.core.common_modules.base_modules import MLP
 

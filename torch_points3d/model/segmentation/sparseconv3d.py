@@ -20,7 +20,7 @@ class APIModel(nn.Module):
         super().__init__()
         self._weight_classes = option_dataset.weight_classes
         self.backbone = SparseConv3d(
-            "unet", dataset.feature_dimension, config=option.backbone, backend=option.get("backend", "minkowski")
+            "unet", option_dataset.feature_dimension, config=option.backbone, backend=option.get("backend", "minkowski")
         )
         self._supports_mixed = sp3d.nn.get_backend() == "torchsparse"
         self.head = nn.Sequential(nn.Linear(self.backbone.output_nc, option_dataset.num_classes))
