@@ -20,7 +20,7 @@ class LitTrainer:
 
     def instantiate_dataset_and_model(self):
         dataset: BaseDataset = instantiate_dataset(self._cfg.data)
-        model: BaseModel = instantiate_model(copy.deepcopy(cfg), dataset) 
+        model: BaseModel = instantiate_model(copy.deepcopy(cfg), dataset)
         model.instantiate_optimizers(cfg) # we will change it and instantiate the optimizers separately
         model.set_pretrained_weights()
         dataset.create_dataloaders(
@@ -34,10 +34,9 @@ class LitTrainer:
 
     def train(self):
 
-        
+
         # model.tracker_options = cfg.get("tracker_options", {})
         # model.trackers = data_module.trackers
         model, data_module = self.instantiate_dataset_and_model()
         trainer = self.instantiate_trainer()
         trainer.fit(model, data_module)
-

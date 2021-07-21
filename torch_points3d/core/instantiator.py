@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
 
 class Instantiator:
-
     def model(self, *args, **kwargs):
         raise NotImplementedError("Child class must implement method")
 
@@ -39,13 +38,12 @@ class Instantiator:
 
 
 class HydraInstantiator(Instantiator):
-
     def model(
         self,
         cfg: DictConfig,
         model_data_kwargs: Optional[DictConfig] = None,
         tokenizer: Optional[DictConfig] = None,
-        pipeline_kwargs: Optional[DictConfig] = None
+        pipeline_kwargs: Optional[DictConfig] = None,
     ) -> "TaskTransformer":
         if model_data_kwargs is None:
             model_data_kwargs = {}
