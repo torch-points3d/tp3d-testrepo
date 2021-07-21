@@ -76,7 +76,7 @@ class SparseConv3dFactory(ModelFactory):
             model_config = OmegaConf.load(path_to_model)
         ModelFactory.resolve_model(model_config, self.num_features, self._kwargs)
         modules_lib = sys.modules[__name__]
-        return SparseConv3dUnet(model_config, None, None, modules_lib, **self.kwargs)
+        return SparseConv3dUnet(model_config, None, modules_lib, **self.kwargs)
 
     def _build_encoder(self):
         if self._config:
@@ -89,14 +89,14 @@ class SparseConv3dFactory(ModelFactory):
             model_config = OmegaConf.load(path_to_model)
         ModelFactory.resolve_model(model_config, self.num_features, self._kwargs)
         modules_lib = sys.modules[__name__]
-        return SparseConv3dEncoder(model_config, None, None, modules_lib, **self.kwargs)
+        return SparseConv3dEncoder(model_config, None, modules_lib, **self.kwargs)
 
 
 class BaseSparseConv3d(UnwrappedUnetBasedModel):
     CONV_TYPE = "sparse"
 
-    def __init__(self, model_config, model_type, dataset, modules, *args, **kwargs):
-        super().__init__(model_config, model_type, dataset, modules)
+    def __init__(self, model_config, model_type, modules, *args, **kwargs):
+        super().__init__(model_config, model_type, modules)
         self.weight_initialization()
         default_output_nc = kwargs.get("default_output_nc", None)
         if not default_output_nc:

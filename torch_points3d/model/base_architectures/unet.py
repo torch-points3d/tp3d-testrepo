@@ -29,8 +29,19 @@ SPECIAL_NAMES = ["radius", "max_num_neighbors", "block_names"]
 
 
 def is_list(entity):
-    return isinstance(sampler, list) or isinstance(sampler, ListConfig)
+    return isinstance(entity, list) or isinstance(entity, ListConfig)
 
+class BaseFactory:
+    def __init__(self, module_name_down, module_name_up, modules_lib):
+        self.module_name_down = module_name_down
+        self.module_name_up = module_name_up
+        self.modules_lib = modules_lib
+
+    def get_module(self, flow):
+        if flow.upper() == "UP":
+            return getattr(self.modules_lib, self.module_name_up, None)
+        else:
+            return getattr(self.modules_lib, self.module_name_down, None)
 
 ############################# UNWRAPPED UNET BASE ###################################
 
@@ -86,7 +97,7 @@ class UnwrappedUnetBasedModel(nn.Module):
         if is_list(opt.down_conv) or "down_conv_nn" not in opt.down_conv:
             raise NotImplementedError
         else:
-            self._init_from_compact_format(opt, model_type, dataset, modules_lib)
+            self._init_from_compact_format(opt, model_type, modules_lib)
 
     def _collect_sampling_ids(self, list_data):
         def extract_matching_key(keys, start_token):
@@ -155,6 +166,7 @@ class UnwrappedUnetBasedModel(nn.Module):
         # Down modules
         for i in range(len(opt.down_conv.down_conv_nn)):
             args = self._fetch_arguments(opt.down_conv, i, "DOWN")
+            
             conv_cls = self._get_from_kwargs(args, "conv_cls")
             down_module = conv_cls(**args)
             self._save_sampling_and_search(down_module)

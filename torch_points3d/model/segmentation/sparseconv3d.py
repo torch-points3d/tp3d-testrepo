@@ -18,7 +18,8 @@ class APIModel(nn.Module):
     def __init__(self, option, option_dataset):
         # call the initialization method of UnetBasedModel
         super().__init__()
-        self._weight_classes = option_dataset.weight_classes
+        if getattr(option_dataset, "weight_classes", None) is not None:
+            self._weight_classes = nn.Parameter(torch.tensor(option_dataset.weight_classes), requires_grad=False)
         self.backbone = SparseConv3d(
             "unet", option_dataset.feature_dimension, config=option.backbone, backend=option.get("backend", "minkowski")
         )
@@ -39,7 +40,7 @@ class APIModel(nn.Module):
         logits = self.head(features)
         self.output = F.log_softmax(logits, dim=-1)
         if self._weight_classes is not None:
-            self._weight_classes = self._weight_classes.to(self.device)
+            self._weight_classes = self._weight_classes
         if self.labels is not None:
             self.loss_seg = F.nll_loss(self.output, self.labels, ignore_index=IGNORE_LABEL, weight=self._weight_classes)
 
