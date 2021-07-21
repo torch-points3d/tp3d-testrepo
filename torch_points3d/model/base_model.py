@@ -7,18 +7,7 @@ from pytorch_lightning.utilities import rank_zero_info
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
 from torch_points3d.core.instantiator import Instantiator
-
-
-@dataclass
-class OptimizerConfig:
-    lr: float = 1e-3
-    weight_decay: float = 0.0
-
-
-@dataclass
-class SchedulerConfig:
-    num_training_steps: int = -1
-    num_warmup_steps: float = 0.1
+from torch_points3d.core.config import OptimizerConfig, SchedulerConfig
 
 
 class PointCloudBaseModel(pl.LightningModule):
@@ -96,11 +85,4 @@ class PointCloudBaseModel(pl.LightningModule):
         This is called on fit start to have access to the data module,
         and initialize any data specific metrics.
         """
-
-    def on_save_checkpoint(self, checkpoint: Dict[str, Any]):
-        # Save tokenizer from datamodule for predictions
-        if self.instantiator:
-            checkpoint["instantiator"] = self.instantiator
-
-    def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
-        self.instantiator = checkpoint.get("instantiator")
+    
