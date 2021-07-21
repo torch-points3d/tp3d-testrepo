@@ -31,6 +31,7 @@ SPECIAL_NAMES = ["radius", "max_num_neighbors", "block_names"]
 def is_list(entity):
     return isinstance(entity, list) or isinstance(entity, ListConfig)
 
+
 class BaseFactory:
     def __init__(self, module_name_down, module_name_up, modules_lib):
         self.module_name_down = module_name_down
@@ -42,6 +43,7 @@ class BaseFactory:
             return getattr(self.modules_lib, self.module_name_up, None)
         else:
             return getattr(self.modules_lib, self.module_name_down, None)
+
 
 ############################# UNWRAPPED UNET BASE ###################################
 
@@ -166,7 +168,7 @@ class UnwrappedUnetBasedModel(nn.Module):
         # Down modules
         for i in range(len(opt.down_conv.down_conv_nn)):
             args = self._fetch_arguments(opt.down_conv, i, "DOWN")
-            
+
             conv_cls = self._get_from_kwargs(args, "conv_cls")
             down_module = conv_cls(**args)
             self._save_sampling_and_search(down_module)
