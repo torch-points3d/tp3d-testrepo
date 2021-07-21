@@ -1,0 +1,6 @@
+defaults: # loads default configs
+  - base_config
+  - dataset: segmentation/s3dis/s3dis1x1
+  - training: default
+
+pretty_print: True

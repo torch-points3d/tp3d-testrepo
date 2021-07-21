@@ -1,5 +1,5 @@
 from typing import Any, Callable, Dict, Optional, Sequence
-from omegaconf import MISSING
+from omegaconf import MISSING, DictConfig
 from dataclasses import dataclass
 
 import hydra.utils
@@ -16,24 +16,29 @@ class S3DISDataConfig(PointCloudDataConfig):
     num_workers: int = 0
     fold: int = 6
 
+def show(x):
+    print(f"type: {type(x).__name__}, value: {repr(x)}")
 
 class s3dis_data_module(PointCloudDataModule):
-    def __init__(self, cfg: S3DISDataConfig = S3DISDataConfig()) -> None:
+    def __init__(self, cfg: DictConfig) -> None:
         super().__init__(cfg)
-
-        self.ds = {
-            "train": S3DIS1x1(
-                self.cfg.dataroot,
-                test_area=self.cfg.fold,
-                train=True,
-                pre_transform=self.cfg.pre_transform,
-                transform=self.cfg.train_transform,
-            ),
-            "test": S3DIS1x1(
-                self.cfg.dataroot,
-                test_area=self.cfg.fold,
-                train=False,
-                pre_transform=self.cfg.pre_transform,
-                transform=self.cfg.train_transform,
-            ),
-        }
+        show(cfg)
+        cfg.num_workers = "aj"
+        show(cfg)
+        # print("pre_transform: ", self.cfg.pre_transform)
+        # self.ds = {
+        #     "train": S3DIS1x1(
+        #         self.cfg.dataroot,
+        #         test_area=self.cfg.fold,
+        #         train=True,
+        #         pre_transform=self.cfg.pre_transform,
+        #         transform=self.cfg.train_transform,
+        #     ),
+        #     "test": S3DIS1x1(
+        #         self.cfg.dataroot,
+        #         test_area=self.cfg.fold,
+        #         train=False,
+        #         pre_transform=self.cfg.pre_transform,
+        #         transform=self.cfg.train_transform,
+        #     ),
+        # }
