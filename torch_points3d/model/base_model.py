@@ -1,5 +1,4 @@
 from typing import Any, Dict, Optional, Tuple, Union
-from dataclasses import dataclass
 
 import pytorch_lightning as pl
 import torch
@@ -85,4 +84,3 @@ class PointCloudBaseModel(pl.LightningModule):
         This is called on fit start to have access to the data module,
         and initialize any data specific metrics.
         """
-    
