@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 
 from torch_points3d.model.base_model import BaseModel
+
 # TODO add IGNORE_LABEL later
 # from torch_points3d.datasets.segmentation import IGNORE_LABEL
 from torch_points3d.applications.sparseconv3d import SparseConv3d

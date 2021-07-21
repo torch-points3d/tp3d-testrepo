@@ -82,7 +82,10 @@ class SparseConv3dFactory(ModelFactory):
         if self._config:
             model_config = self._config
         else:
-            path_to_model = os.path.join(PATH_TO_CONFIG, "encoder_{}.yaml".format(self.num_layers),)
+            path_to_model = os.path.join(
+                PATH_TO_CONFIG,
+                "encoder_{}.yaml".format(self.num_layers),
+            )
             model_config = OmegaConf.load(path_to_model)
         ModelFactory.resolve_model(model_config, self.num_features, self._kwargs)
         modules_lib = sys.modules[__name__]
