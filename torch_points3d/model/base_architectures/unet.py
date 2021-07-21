@@ -169,10 +169,6 @@ class UnwrappedUnetBasedModel(BaseModel):
                 self._save_upsample(up_module)
                 self.up_modules.append(up_module)
 
-        self.metric_loss_module, self.miner_module = BaseModel.get_metric_loss_and_miner(
-            getattr(opt, "metric_loss", None), getattr(opt, "miner", None)
-        )
-
     def _get_factory(self, model_name, modules_lib) -> BaseFactory:
         factory_module_cls = getattr(modules_lib, "{}Factory".format(model_name), None)
         if factory_module_cls is None:
