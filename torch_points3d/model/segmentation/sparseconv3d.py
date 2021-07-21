@@ -4,8 +4,9 @@ import torch.nn as nn
 import torchsparse as TS
 
 
-from torch_points3d.models.base_model import BaseModel
-from torch_points3d.datasets.segmentation import IGNORE_LABEL
+from torch_points3d.model.base_model import BaseModel
+# TODO add IGNORE_LABEL later
+# from torch_points3d.datasets.segmentation import IGNORE_LABEL
 from torch_points3d.applications.sparseconv3d import SparseConv3d
 import torch_points3d.modules.SparseConv3d as sp3d
 
@@ -26,11 +27,11 @@ class APIModel(BaseModel):
         self.head = nn.Sequential(nn.Linear(self.backbone.output_nc, dataset.num_classes))
         self.loss_names = ["loss_seg"]
 
-    def set_input(self, data, device):
+    def set_input(self, data):
         self.batch_idx = data.batch.squeeze()
         self.input = data
         if data.y is not None:
-            self.labels = data.y.to(self.device)
+            self.labels = data.y
         else:
             self.labels = None
 
