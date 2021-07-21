@@ -13,13 +13,15 @@ from torch_points3d.core.common_modules import FastBatchNorm1d, Seq
 
 log = logging.getLogger(__name__)
 
-
+IGNORE_LABEL: int = -1
 class APIModel(nn.Module):
     def __init__(self, option, option_dataset):
         # call the initialization method of UnetBasedModel
         super().__init__()
         if getattr(option_dataset, "weight_classes", None) is not None:
             self._weight_classes = nn.Parameter(torch.tensor(option_dataset.weight_classes), requires_grad=False)
+        else:
+            self._weight_classes = None
         self.backbone = SparseConv3d(
             "unet", option_dataset.feature_dimension, config=option.backbone, backend=option.get("backend", "minkowski")
         )
