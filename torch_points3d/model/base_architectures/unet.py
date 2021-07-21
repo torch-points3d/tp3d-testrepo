@@ -18,7 +18,7 @@ from omegaconf.dictconfig import DictConfig
 import logging
 import copy
 
-from torch_points3d.models.base_model import BaseModel
+# from torch_points3d.models.base_model import BaseModel
 from torch_points3d.core.common_modules.base_modules import Identity
 
 
@@ -35,7 +35,7 @@ def is_list(entity):
 ############################# UNWRAPPED UNET BASE ###################################
 
 
-class UnwrappedUnetBasedModel(BaseModel):
+class UnwrappedUnetBasedModel(nn.Module):
     """Create a Unet unwrapped generator"""
 
     def _save_sampling_and_search(self, down_conv):
@@ -79,7 +79,7 @@ class UnwrappedUnetBasedModel(BaseModel):
 
         """
         opt = copy.deepcopy(opt)
-        super(UnwrappedUnetBasedModel, self).__init__(opt)
+        super(UnwrappedUnetBasedModel, self).__init__()
         # detect which options format has been used to define the model
         self._spatial_ops_dict = {"neighbour_finder": [], "sampler": [], "upsample_op": []}
 

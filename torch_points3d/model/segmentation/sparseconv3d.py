@@ -14,16 +14,16 @@ from torch_points3d.core.common_modules import FastBatchNorm1d, Seq
 log = logging.getLogger(__name__)
 
 
-class APIModel(BaseModel):
+class APIModel(nn.Module):
     def __init__(self, option, option_dataset):
         # call the initialization method of UnetBasedModel
-        super().__init__(option)
+        super().__init__()
         self._weight_classes = option_dataset.weight_classes
         self.backbone = SparseConv3d(
             "unet", dataset.feature_dimension, config=option.backbone, backend=option.get("backend", "minkowski")
         )
         self._supports_mixed = sp3d.nn.get_backend() == "torchsparse"
-        self.head = nn.Sequential(nn.Linear(self.backbone.output_nc, dataset.num_classes))
+        self.head = nn.Sequential(nn.Linear(self.backbone.output_nc, option_dataset.num_classes))
         self.loss_names = ["loss_seg"]
 
     def set_input(self, data):
