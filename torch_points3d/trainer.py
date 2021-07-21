@@ -4,7 +4,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.utilities.distributed import rank_zero_info
-from hydra.utils.instantiate as hydra_instantiate
+import hydra.utils.instantiate as hydra_instantiate
 
 from torch_points3d.datasets.dataset_factory import instantiate_dataset, convert_to_lightning_data_module
 from torch_points3d.datasets.dataset_factory import instantiate_dataset
