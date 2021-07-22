@@ -1,10 +1,8 @@
-from typing import Any, Optional
-
 import hydra
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.utilities.distributed import rank_zero_info
-from hydra.utils.instantiate as hydra_instantiate
+import hydra.utils.instantiate as hydra_instantiate
 
 from torch_points3d.datasets.dataset_factory import instantiate_dataset, convert_to_lightning_data_module
 from torch_points3d.datasets.dataset_factory import instantiate_dataset
@@ -21,7 +19,7 @@ class LitTrainer:
     def instantiate_dataset_and_model(self):
         dataset: BaseDataset = instantiate_dataset(self._cfg.data)
         model: BaseModel = instantiate_model(copy.deepcopy(cfg), dataset)
-        model.instantiate_optimizers(cfg) # we will change it and instantiate the optimizers separately
+        model.instantiate_optimizers(cfg)  # we will change it and instantiate the optimizers separately
         model.set_pretrained_weights()
         dataset.create_dataloaders(
             cfg.training.batch_size,
@@ -33,7 +31,6 @@ class LitTrainer:
         return model, data_module
 
     def train(self):
-
 
         # model.tracker_options = cfg.get("tracker_options", {})
         # model.trackers = data_module.trackers
