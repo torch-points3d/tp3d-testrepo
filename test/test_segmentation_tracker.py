@@ -10,9 +10,10 @@ from torch_geometric.data import Data
 DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT = os.path.join(DIR, "..")
 sys.path.insert(0, ROOT)
-sys.path.append('.')
+sys.path.append(".")
 
 from torch_points3d.metrics.segmentation.segmentation_tracker import SegmentationTracker
+
 
 class MockDataset:
     INV_OBJECT_LABEL = {0: "first", 1: "wall", 2: "not", 3: "here", 4: "hoy"}

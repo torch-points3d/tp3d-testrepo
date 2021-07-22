@@ -8,13 +8,14 @@ class BaseTracker(nn.Module):
     """
     pytorch Module to manage the losses and the metrics
     """
+
     def __init__(self, stage: str = "train"):
         super().__init__()
         self.stage: str = stage
         self._finalised: bool = False
         self.loss_metrics: Dict[str, Callable] = dict()
 
-    def track(self, output_model, *args,  **kwargs) -> Dict[str, Any]:
+    def track(self, output_model, *args, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError
 
     def track_loss(self, losses: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
@@ -27,7 +28,9 @@ class BaseTracker(nn.Module):
             out_loss[loss_key] = val
         return out_loss
 
-    def forward(self, output_model: Dict[str, Any], losses: Optional[Dict[str, torch.Tensor]] = None, *args, **kwargs) -> Dict[str, Any]:
+    def forward(
+        self, output_model: Dict[str, Any], losses: Optional[Dict[str, torch.Tensor]] = None, *args, **kwargs
+    ) -> Dict[str, Any]:
         if self._finalised:
             raise RuntimeError("Cannot track new values with a finalised tracker, you need to reset it first")
         tracked_metric = self.track(output_model, *args, **kwargs)
@@ -59,4 +62,3 @@ class BaseTracker(nn.Module):
         self._finalised = False
         self.stage = stage
         self.loss_metrics = dict()
-
