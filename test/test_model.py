@@ -9,13 +9,12 @@ from torch_geometric.data import Batch
 DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT = os.path.join(DIR, "..")
 sys.path.insert(0, ROOT)
-sys.path.append('.')
+sys.path.append(".")
 
 from torch_points3d.models.segmentation.sparseconv3d import APIModel
 
 
 class TestAPIModel(unittest.TestCase):
-    
     def test_forward(self):
         option_dataset = OmegaConf.create({"feature_dimension": 1, "num_classes": 10})
 
