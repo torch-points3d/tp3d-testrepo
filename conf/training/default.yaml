@@ -1,3 +1,5 @@
+defaults:
+  - base_trainer
 lr: 5e-5
 
 # read in dataset
