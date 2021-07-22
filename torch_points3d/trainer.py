@@ -6,8 +6,8 @@ from pytorch_lightning.utilities.distributed import rank_zero_info
 
 # from hydra.utils.instantiate as hydra_instantiate
 
-from torch_points3d.model.base_model import PointCloudBaseModel
-from torch_points3d.dataset.base_dataset import PointCloudDataModule, PointCloudDataConfig, PointCloudDataModule
+from torch_points3d.models.base_model import PointCloudBaseModel
+from torch_points3d.datasets.base_dataset import PointCloudDataModule, PointCloudDataConfig, PointCloudDataModule
 from torch_points3d.core.instantiator import HydraInstantiator, Instantiator
 from torch_points3d.core.config import TaskConfig, TrainerConfig
 

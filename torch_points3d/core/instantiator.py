@@ -6,11 +6,11 @@ import pytorch_lightning as pl
 import torch
 from omegaconf import DictConfig
 
-from torch_points3d.dataset.base_dataset import PointCloudDataModule
+from torch_points3d.datasets.base_dataset import PointCloudDataModule
 
 if TYPE_CHECKING:
     # avoid circular imports
-    from torch_points3d.model.base_model import PointCloudBaseModel
+    from torch_points3d.models.base_model import PointCloudBaseModel
 
 
 class Instantiator:

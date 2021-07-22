@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import hydra.utils
 import torch_geometric.transforms as T
 from torch.utils.data import DataLoader
-from torch_points3d.dataset.base_dataset import PointCloudDataModule, PointCloudDataConfig
+from torch_points3d.datasets.base_dataset import PointCloudDataModule, PointCloudDataConfig
 
 from torch_geometric.datasets import S3DIS as S3DIS1x1
 
