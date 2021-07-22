@@ -15,6 +15,7 @@ from torch_points3d.models.segmentation.sparseconv3d import APIModel
 
 
 class TestAPIModel(unittest.TestCase):
+    
     def test_forward(self):
         option_dataset = OmegaConf.create({"feature_dimension": 1, "num_classes": 10})
 

@@ -1,10 +1,12 @@
 import torch
-from typing import Dict, Optional, Tuple, Any
+from typing import Dict, Optional, Tuple, Any, Union
 from torchmetrics import ConfusionMatrix
 from torchmetrics import Metric
 
+from torch_points3d.metrics.base_tracker import BaseTracker
 
-def compute_average_intersection_union(matrix: torch.Tensor, missing_as_one: bool = False) -> torch.Tensor:
+
+def compute_average_intersection_union(confusion_matrix: torch.Tensor, missing_as_one: bool = False) -> torch.Tensor:
     """
     compute intersection over union on average from confusion matrix
     Parameters
@@ -42,7 +44,7 @@ def compute_mean_class_accuracy(confusion_matrix: torch.Tensor) -> torch.Tensor:
     re = (torch.diagonal(confusion_matrix)[labels_presents].float() / max_ones_total_gts[labels_presents]).sum()
     return re / float(len(labels_presents))
 
-def compute_overall_accuracy(confusion_matrix: torch.Tensor) -> torch.Tensor:
+def compute_overall_accuracy(confusion_matrix: torch.Tensor) -> Union[int, torch.Tensor]:
     """
     compute overall accuracy from confusion matrix
     
@@ -116,7 +118,7 @@ class SegmentationTracker(BaseTracker):
         segmentation_metrics = self.compute_metrics_from_cm(matrix)
         return segmentation_metrics
 
-    def finalise(self):
+    def _finalise(self):
         matrix = self.confusion_matrix_metric.compute()
         segmentation_metrics = self.compute_metrics_from_cm(matrix)
         return segmentation_metrics
