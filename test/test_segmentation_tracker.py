@@ -1,10 +1,18 @@
 import torch
+import sys
+import os
 
 import unittest
 import pytest
 
 from torch_geometric.data import Data
 
+DIR = os.path.dirname(os.path.realpath(__file__))
+ROOT = os.path.join(DIR, "..")
+sys.path.insert(0, ROOT)
+sys.path.append('.')
+
+from torch_points3d.metrics.segmentation.segmentation_tracker import SegmentationTracker
 
 class MockDataset:
     INV_OBJECT_LABEL = {0: "first", 1: "wall", 2: "not", 3: "here", 4: "hoy"}
@@ -62,7 +70,46 @@ class MockModel:
 
 class TestSegmentationMetrics(unittest.TestCase):
     def test_forward(self):
-        pass
+        tracker = SegmentationTracker(num_classes=2, stage="train")
+        model = MockModel()
+        metrics = tracker(model)
+        # metrics = tracker.get_metrics()
 
-    def test_finalize(self):
-        pass
+        for k in ["train_acc", "train_miou", "train_macc"]:
+            self.assertAlmostEqual(metrics[k], 100, 5)
+
+        model.iter += 1
+        metrics = tracker(model)
+        # metrics = tracker.get_metrics()
+        metrics = tracker.finalise()
+        for k in ["train_acc", "train_macc"]:
+            self.assertEqual(metrics[k], 50)
+        self.assertAlmostEqual(metrics["train_miou"], 25, 5)
+        self.assertEqual(metrics["train_loss_1"], 1.5)
+
+        tracker.reset("test")
+        model.iter += 1
+        metrics = tracker(model)
+        # metrics = tracker.get_metrics()
+        for k in ["test_acc", "test_miou", "test_macc"]:
+            self.assertAlmostEqual(metrics[k].item(), 0, 5)
+
+    def test_ignore_label(self):
+        tracker = SegmentationTracker(num_classes=2, ignore_label=-100)
+        tracker.reset("test")
+        model = MockModel()
+        model.iter = 3
+        metrics = tracker(model)
+        # metrics = tracker.get_metrics()
+        for k in ["test_acc", "test_miou", "test_macc"]:
+            self.assertAlmostEqual(metrics[k], 100, 5)
+
+    def test_finalise(self):
+        tracker = SegmentationTracker(num_classes=2, ignore_label=-100)
+        tracker.reset("test")
+        model = MockModel()
+        model.iter = 3
+        tracker(output)
+        tracker.finalise()
+        with self.assertRaises(RuntimeError):
+            tracker(model)

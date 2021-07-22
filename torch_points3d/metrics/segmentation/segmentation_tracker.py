@@ -92,7 +92,7 @@ class SegmentationTracker(BaseTracker):
             stage: str = "train",
             ignore_label: int = -1,
             eps: float = 1e-8,):
-        super().__init__()
+        super().__init__(stage)
         self._ignore_label = ignore_label
         self._num_classes = num_classes
         self.confusion_matrix_metric = ConfusionMatrix(num_classes=self._num_classes)
@@ -112,9 +112,9 @@ class SegmentationTracker(BaseTracker):
         }
 
 
-    def track(targets: torch.Tensor, preds: torch.Tensor, **kwargs) -> Dict[str, Any]:
-        mask = targets != self._ignore_label
-        matrix = self.confusion_matrix_metric(preds[mask], targets[mask])
+    def track(self, output, **kwargs) -> Dict[str, Any]:
+        mask = output['targets'] != self._ignore_label
+        matrix = self.confusion_matrix_metric(output['preds'][mask], output['targets'][mask])
         segmentation_metrics = self.compute_metrics_from_cm(matrix)
         return segmentation_metrics
 
