@@ -9,6 +9,7 @@ from torch_geometric.data import Batch
 DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT = os.path.join(DIR, "..")
 sys.path.insert(0, ROOT)
+sys.path.append('.')
 
 from torch_points3d.models.segmentation.sparseconv3d import APIModel
 
