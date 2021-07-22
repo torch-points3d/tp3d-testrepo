@@ -1,0 +1,17 @@
+# @package dataset
+# cfg:
+  # torch data-loader specific arguments
+cfg: 
+  batch_size: ${training.batch_size}
+  num_workers: ${training.num_workers}
+  dataroot: data
+
+  common_transform:
+  aug_transform:
+  pre_transform:
+
+  val_transform: "${dataset.cfg.common_transform}"
+  test_transform: "${dataset.cfg.val_transform}"
+  train_transform: 
+    - "${dataset.cfg.aug_transform}"
+    - "${dataset.cfg.common_transform}"

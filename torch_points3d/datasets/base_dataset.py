@@ -1,23 +1,34 @@
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Sequence
+from dataclasses import dataclass
 
+import hydra
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
+from torch_points3d.core.config import BaseDataConfig
 
-from lightning_transformers.core.config import TransformerDataConfig
 
-class TransformerDataModule(pl.LightningDataModule):
+@dataclass
+class PointCloudDataConfig(BaseDataConfig):
+    batch_size: int = 32
+    num_workers: int = 0
+    dataroot: str = "data"
+    pre_transform: Sequence[Any] = None
+    train_transform: Sequence[Any] = None
+    test_transform: Sequence[Any] = None
 
-    def __init__(self, cfg: TransformerDataConfig = TransformerDataConfig()) -> None:
+
+class PointCloudDataModule(pl.LightningDataModule):
+    def __init__(self, cfg: PointCloudDataConfig = PointCloudDataConfig()) -> None:
         super().__init__()
         self.cfg = cfg
         self.ds = None
 
+        self.cfg.dataroot = hydra.utils.to_absolute_path(self.cfg.dataroot)
+        print(self.cfg.dataroot)
+
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
-            self.ds["train"],
-            batch_size=self.batch_size,
-            num_workers=self.cfg.num_workers,
-            collate_fn=self.collate_fn,
+            self.ds["train"], batch_size=self.batch_size, num_workers=self.cfg.num_workers, collate_fn=self.collate_fn,
         )
 
     def val_dataloader(self) -> DataLoader:

@@ -1,17 +1,16 @@
 import logging
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Optional, TYPE_CHECKING
 
 import hydra
 import pytorch_lightning as pl
 import torch
 from omegaconf import DictConfig
 
-from lightning_transformers.core import TransformerDataModule
-from lightning_transformers.core.data import TokenizerDataModule
+from torch_points3d.datasets.base_dataset import PointCloudDataModule
 
 if TYPE_CHECKING:
     # avoid circular imports
-    from lightning_transformers.core import TaskTransformer
+    from torch_points3d.models.base_model import PointCloudBaseModel
 
 
 class Instantiator:
@@ -38,25 +37,9 @@ class Instantiator:
 
 
 class HydraInstantiator(Instantiator):
-    def model(
-        self,
-        cfg: DictConfig,
-        model_data_kwargs: Optional[DictConfig] = None,
-        tokenizer: Optional[DictConfig] = None,
-        pipeline_kwargs: Optional[DictConfig] = None,
-    ) -> "TaskTransformer":
-        if model_data_kwargs is None:
-            model_data_kwargs = {}
-        model_data_kwargs = dict(model_data_kwargs)  # avoid ConfigKeyError: Key 'tokenizer' is not in struct`
+    def model(self, cfg: DictConfig) -> "PointCloudBaseModel":
 
-        # use `model_data_kwargs` to pass `tokenizer` and `pipeline_kwargs`
-        # as not all models might contain these parameters.
-        if tokenizer:
-            model_data_kwargs["tokenizer"] = self.instantiate(tokenizer)
-        if pipeline_kwargs:
-            model_data_kwargs["pipeline_kwargs"] = pipeline_kwargs
-
-        return self.instantiate(cfg, instantiator=self, **model_data_kwargs)
+        return self.instantiate(cfg, instantiator=self)
 
     def optimizer(self, model: torch.nn.Module, cfg: DictConfig) -> torch.optim.Optimizer:
         no_decay = ["bias", "LayerNorm.weight"]
@@ -79,13 +62,8 @@ class HydraInstantiator(Instantiator):
     def scheduler(self, cfg: DictConfig, optimizer: torch.optim.Optimizer) -> torch.optim.lr_scheduler._LRScheduler:
         return self.instantiate(cfg, optimizer=optimizer)
 
-    def data_module(
-        self,
-        cfg: DictConfig,
-        tokenizer: Optional[DictConfig] = None,
-    ) -> Union[TransformerDataModule, TokenizerDataModule]:
-        if tokenizer:
-            return self.instantiate(cfg, tokenizer=self.instantiate(tokenizer))
+    def data_module(self, cfg: DictConfig) -> PointCloudDataModule:
+
         return self.instantiate(cfg)
 
     def logger(self, cfg: DictConfig) -> Optional[logging.Logger]:
