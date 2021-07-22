@@ -3,6 +3,7 @@ from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning.utilities.distributed import rank_zero_info
 
+
 # from hydra.utils.instantiate as hydra_instantiate
 
 from torch_points3d.model.base_model import PointCloudBaseModel
@@ -36,7 +37,9 @@ class LitTrainer:
         self.trainer = instantiator.trainer(
             trainer,
             # logger=logger,
+
         )
 
     def train(self):
         self.trainer.fit(self.model, self.data_module)
+
