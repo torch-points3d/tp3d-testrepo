@@ -199,7 +199,7 @@ class SparseConv3dUnet(BaseSparseConv3d):
         for i in range(len(self.down_modules) - 1):
             data = self.down_modules[i](data)
             stack_down.append(data)
-
+            
         data = self.down_modules[-1](data)
         stack_down.append(None)
         # TODO : Manage the inner module
