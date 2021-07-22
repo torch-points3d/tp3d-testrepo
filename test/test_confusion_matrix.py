@@ -16,40 +16,39 @@ from torch_points3d.metrics.segmentation.segmentation_tracker import compute_ave
 from torch_points3d.metrics.segmentation.segmentation_tracker import compute_overall_accuracy
 from torch_points3d.metrics.segmentation.segmentation_tracker import compute_mean_class_accuracy
 
-class TestConfusionMatrix(unittest.TestCase):
-
-    def test_compute_intersection_union_per_class(self):
-        matrix = torch.tensor([[4, 1], [2, 10]])
-        iou, _ = compute_intersection_union_per_class(matrix)
-        miou = compute_average_intersection_union(matrix)
-        print(iou)
-        self.assertAlmostEqual(iou[0].item(), 4 / (4.0 + 1.0 + 2.0))
-        self.assertAlmostEqual(iou[1].item(), 10 / (10.0 + 1.0 + 2.0))
-        self.assertAlmostEqual(iou.mean().item(), miou.item())
-
-    def test_compute_overall_accuracy(self):
-        list_matrix  = [
-            torch.tensor([[4, 1], [2, 10]]).float(),
-            torch.tensor([[4, 1], [2, 10]]).int(),
-            torch.tensor([[0, 0], [0, 0]]).float()
-        ]
-        list_answer = [
-            (4.0+10.0)/(4.0 + 10.0 + 1.0 +2.0),
-            (4.0+10.0)/(4.0 + 10.0 + 1.0 +2.0),
-            0.0
-        ]
-        for i in range(len(list_matrix)):
-            acc = compute_overall_accuracy(list_matrix[i])
-            if(isinstance(acc, torch.Tensor)):
-                self.assertAlmostEqual(acc.item(), list_answer[i])
-            else:
-                self.assertAlmostEqual(acc, list_answer[i])
 
 
-    def test_compute_mean_class_accuracy(self):
-        matrix = torch.tensor([[4, 1], [2, 10]]).float()
-        macc = compute_mean_class_accuracy(matrix)
-        self.assertAlmostEqual(macc.item(), (4/5 + 10/12)*0.5)
+def test_compute_intersection_union_per_class():
+    matrix = torch.tensor([[4, 1], [2, 10]])
+    iou, _ = compute_intersection_union_per_class(matrix)
+    miou = compute_average_intersection_union(matrix)
+    np.testing.assert_allclose(iou[0].item(), 4 / (4.0 + 1.0 + 2.0))
+    np.testing.assert_allclose(iou[1].item(), 10 / (10.0 + 1.0 + 2.0))
+    np.testing.assert_allclose(iou.mean().item(), miou.item())
+
+def test_compute_overall_accuracy():
+    list_matrix  = [
+        torch.tensor([[4, 1], [2, 10]]).float(),
+        torch.tensor([[4, 1], [2, 10]]).int(),
+        torch.tensor([[0, 0], [0, 0]]).float()
+    ]
+    list_answer = [
+        (4.0+10.0)/(4.0 + 10.0 + 1.0 +2.0),
+        (4.0+10.0)/(4.0 + 10.0 + 1.0 +2.0),
+        0.0
+    ]
+    for i in range(len(list_matrix)):
+        acc = compute_overall_accuracy(list_matrix[i])
+        if(isinstance(acc, torch.Tensor)):
+            np.testing.assert_allclose(acc.item(), list_answer[i])
+        else:
+            np.testing.assert_allclose(acc, list_answer[i])
+
+
+def test_compute_mean_class_accuracy():
+    matrix = torch.tensor([[4, 1], [2, 10]]).float()
+    macc = compute_mean_class_accuracy(matrix)
+    np.testing.assert_allclose(macc.item(), (4/5 + 10/12)*0.5)
 
 
 
