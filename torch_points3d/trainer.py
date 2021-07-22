@@ -37,9 +37,7 @@ class LitTrainer:
         self.trainer = instantiator.trainer(
             trainer,
             # logger=logger,
-
         )
 
     def train(self):
         self.trainer.fit(self.model, self.data_module)
-
