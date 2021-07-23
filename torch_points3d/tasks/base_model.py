@@ -1,11 +1,9 @@
 from typing import Any, Dict, Optional, Tuple, Union
 
 import pytorch_lightning as pl
-import torch
 from pytorch_lightning.utilities import rank_zero_info
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from omegaconf import DictConfig
-import torch.nn.functional as F
 
 from torch_points3d.core.instantiator import Instantiator
 from torch_points3d.core.config import OptimizerConfig, SchedulerConfig
@@ -17,7 +15,7 @@ class PointCloudBaseModule(pl.LightningModule):
         model: DictConfig,
         optimizer: OptimizerConfig,
         instantiator: Instantiator,
-        scheduler: SchedulerConfig = None, # scheduler shouldn't be required
+        scheduler: SchedulerConfig = None,  # scheduler shouldn't be required
     ):
         super().__init__()
         # some optimizers/schedulers need parameters only known dynamically
@@ -31,7 +29,7 @@ class PointCloudBaseModule(pl.LightningModule):
     def _init_model(self, model_cfg):
         print(model_cfg)
         self.model = self.instantiator.model(model_cfg)
-            
+
     def configure_optimizers(self) -> Dict:
         """Prepare optimizer and scheduler"""
         optims = {}

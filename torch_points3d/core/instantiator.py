@@ -43,7 +43,7 @@ class HydraInstantiator(Instantiator):
 
     def model(self, cfg: DictConfig) -> "PointCloudBaseModel":
         return self.instantiate(cfg, self)
-        
+
     def backbone(self, cfg: DictConfig):
         return self.instantiate(cfg)
 

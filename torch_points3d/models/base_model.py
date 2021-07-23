@@ -1,5 +1,3 @@
-from typing import Any, Dict, Optional, Tuple, Union
-
 import torch.nn as nn
 
 from torch_points3d.core.instantiator import Instantiator
@@ -12,7 +10,7 @@ class PointCloudBaseModel(nn.Module):
         self.instantiator = instantiator
 
     def set_input(self, data):
-        raise(NotImplementedError("set_input needs to be defined!"))
-    
+        raise (NotImplementedError("set_input needs to be defined!"))
+
     def forward(self):
-        raise(NotImplementedError("forward needs to be defined!"))
+        raise (NotImplementedError("forward needs to be defined!"))

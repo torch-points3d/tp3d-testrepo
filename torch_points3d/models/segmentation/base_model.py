@@ -1,4 +1,3 @@
-from typing import Any, Dict, Optional, Tuple, Union
 from omegaconf import DictConfig
 
 import torch.nn as nn
@@ -11,10 +10,10 @@ from torch_points3d.models.base_model import PointCloudBaseModel
 class SegmentationBaseModel(PointCloudBaseModel):
     def __init__(self, instantiator: Instantiator, num_classes: int, backbone: DictConfig):
         super().__init__(instantiator)
-        
+
         print(backbone)
-        self.backbone = self.instantiator.backbone(backbone)  
-             
+        self.backbone = self.instantiator.backbone(backbone)
+
         self.head = nn.Sequential(nn.Linear(self.backbone.output_nc, num_classes))
 
     def set_input(self, data):
@@ -24,7 +23,7 @@ class SegmentationBaseModel(PointCloudBaseModel):
             self.labels = data.y
         else:
             self.labels = None
-    
+
     def forward(self):
         features = self.backbone(self.input).x
         logits = self.head(features)
