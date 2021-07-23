@@ -30,12 +30,12 @@ class LitTrainer:
                 "The instantiator did not return a DataModule instance." " Hydra hint: is `dataset._target_` defined?`"
             )
         self.data_module.setup("fit")
-        
+
         self.litmodel: PointCloudBaseModel = instantiator.litmodel(model, self.data_module)
         print(self.litmodel)
         self.trainer = instantiator.trainer(
             trainer,
-            logger=None, # eventually add logger config back in
+            logger=None,  # eventually add logger config back in
         )
 
     def train(self):

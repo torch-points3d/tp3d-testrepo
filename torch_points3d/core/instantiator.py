@@ -39,7 +39,7 @@ class Instantiator:
 class HydraInstantiator(Instantiator):
     def litmodel(self, cfg: DictConfig, data_module: pl.LightningDataModule) -> "PointCloudBaseModel":
         return self.instantiate(cfg, instantiator=self, data_module=data_module)
-        
+
     def backbone(self, cfg: DictConfig, feature_dimension: int):
         return self.instantiate(cfg, input_nc=feature_dimension)
 

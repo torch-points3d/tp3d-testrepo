@@ -18,7 +18,7 @@ class PointCloudBaseModel(pl.LightningModule):
         optimizer: OptimizerConfig,
         instantiator: Instantiator,
         data_module: pl.LightningDataModule,
-        scheduler: SchedulerConfig = None, # scheduler shouldn't be required
+        scheduler: SchedulerConfig = None,  # scheduler shouldn't be required
     ):
         super().__init__()
         # some optimizers/schedulers need parameters only known dynamically
@@ -52,7 +52,7 @@ class PointCloudBaseModel(pl.LightningModule):
             self.labels = data.y
         else:
             self.labels = None
-    
+
     def forward(self):
         features = self.backbone(self.input).x
         logits = self.head(features)
@@ -61,7 +61,7 @@ class PointCloudBaseModel(pl.LightningModule):
         # only compute loss if loss is defined and the dset has labels
         if self.labels is not None and self.criterion is not None:
             return self.criterion(self.output, self.labels)
-            
+
     def configure_optimizers(self) -> Dict:
         """Prepare optimizer and scheduler"""
         optims = {}
