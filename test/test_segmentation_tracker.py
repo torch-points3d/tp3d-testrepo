@@ -3,7 +3,6 @@ import torch
 import sys
 import os
 
-import unittest
 import pytest
 
 
@@ -78,7 +77,7 @@ def test_forward():
     losses = model.get_current_losses()
     metrics = tracker(output, losses)
     # metrics = tracker.get_metrics()
-    
+
     for k in ["train_acc", "train_miou", "train_macc"]:
         np.testing.assert_allclose(metrics[k], 100, rtol=1e-5)
     model.iter += 1
@@ -119,6 +118,3 @@ def test_ignore_label(finalise):
         tracker.finalise()
         with pytest.raises(RuntimeError):
             tracker(output)
-
-
-    
