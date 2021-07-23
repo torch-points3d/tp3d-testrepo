@@ -10,6 +10,7 @@ from torch_points3d.datasets.base_dataset import PointCloudDataModule
 
 if TYPE_CHECKING:
     # avoid circular imports
+    from torch_points3d.tasks.base_model import PointCloudBaseModule
     from torch_points3d.models.base_model import PointCloudBaseModel
 
 
@@ -37,11 +38,14 @@ class Instantiator:
 
 
 class HydraInstantiator(Instantiator):
-    def litmodel(self, cfg: DictConfig, data_module: pl.LightningDataModule) -> "PointCloudBaseModel":
-        return self.instantiate(cfg, instantiator=self, data_module=data_module)
+    def litmodel(self, cfg: DictConfig) -> "PointCloudBaseModule":
+        return self.instantiate(cfg, instantiator=self)
 
-    def backbone(self, cfg: DictConfig, feature_dimension: int):
-        return self.instantiate(cfg, input_nc=feature_dimension)
+    def model(self, cfg: DictConfig) -> "PointCloudBaseModel":
+        return self.instantiate(cfg, self)
+        
+    def backbone(self, cfg: DictConfig):
+        return self.instantiate(cfg)
 
     def optimizer(self, model: torch.nn.Module, cfg: DictConfig) -> torch.optim.Optimizer:
         return self.instantiate(cfg, model.parameters())

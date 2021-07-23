@@ -13,7 +13,7 @@ from torch.nn import (
     BatchNorm1d as BN,
     Dropout,
 )
-from torch_points3d.models.base_architectures.base_model import BaseModel
+from torch_points3d.applications.base_architectures.base_model import BaseModel
 from omegaconf.listconfig import ListConfig
 from omegaconf.dictconfig import DictConfig
 import logging

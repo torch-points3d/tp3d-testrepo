@@ -2,8 +2,9 @@
 defaults:
   - /model/segmentation/ResUNet32
 
-backbone:
-  down_conv:
-    N: [ 0, 2, 3, 4, 6 ]
-  up_conv:
-    N: [ 1, 1, 1, 1, 1 ]
+model: 
+  backbone:
+    down_conv:
+      N: [ 0, 2, 3, 4, 6 ]
+    up_conv:
+      N: [ 1, 1, 1, 1, 1 ]

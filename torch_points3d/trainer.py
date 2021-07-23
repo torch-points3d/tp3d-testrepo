@@ -6,7 +6,7 @@ from pytorch_lightning.utilities.distributed import rank_zero_info
 
 # from hydra.utils.instantiate as hydra_instantiate
 
-from torch_points3d.models.base_model import PointCloudBaseModel
+from torch_points3d.tasks.base_model import PointCloudBaseModule
 from torch_points3d.datasets.base_dataset import PointCloudDataModule, PointCloudDataConfig, PointCloudDataModule
 from torch_points3d.core.instantiator import HydraInstantiator, Instantiator
 from torch_points3d.core.config import TaskConfig, TrainerConfig
@@ -30,12 +30,12 @@ class LitTrainer:
                 "The instantiator did not return a DataModule instance." " Hydra hint: is `dataset._target_` defined?`"
             )
         self.data_module.setup("fit")
-
-        self.litmodel: PointCloudBaseModel = instantiator.litmodel(model, self.data_module)
+        
+        self.litmodel: PointCloudBaseModule = instantiator.litmodel(model)
         print(self.litmodel)
         self.trainer = instantiator.trainer(
             trainer,
-            logger=None,  # eventually add logger config back in
+            logger=None, # eventually add logger config back in
         )
 
     def train(self):

@@ -2,6 +2,8 @@
 # cfg:
   # torch data-loader specific arguments
 cfg: 
+  num_classes: 
+  feature_dimension: 
   batch_size: ${training.batch_size}
   num_workers: ${training.num_workers}
   dataroot: data

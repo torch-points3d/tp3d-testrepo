@@ -2,7 +2,11 @@
 defaults:
   - /model/default
 
-_target_: torch_points3d.models.segmentation.base_model.SegmentationBaseModel
+model:
+  _recursive_: false
+  _target_: torch_points3d.models.segmentation.base_model.SegmentationBaseModel
+  num_classes: ${dataset.cfg.num_classes}
 
-backbone:
-  architecture: unet
+  backbone:
+    input_nc: ${dataset.cfg.feature_dimension}
+    architecture: unet
