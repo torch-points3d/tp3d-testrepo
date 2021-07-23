@@ -1,9 +1,11 @@
+import numpy as np
 import torch
 import sys
 import os
 
 import unittest
 import pytest
+
 
 from torch_geometric.data import Data
 
@@ -69,48 +71,54 @@ class MockModel:
         return "cpu"
 
 
-class TestSegmentationMetrics(unittest.TestCase):
-    def test_forward(self):
-        tracker = SegmentationTracker(num_classes=2, stage="train")
-        model = MockModel()
-        metrics = tracker(model)
-        # metrics = tracker.get_metrics()
+def test_forward():
+    tracker = SegmentationTracker(num_classes=2, stage="train")
+    model = MockModel()
+    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    losses = model.get_current_losses()
+    metrics = tracker(output, losses)
+    # metrics = tracker.get_metrics()
+    
+    for k in ["train_acc", "train_miou", "train_macc"]:
+        np.testing.assert_allclose(metrics[k], 100, rtol=1e-5)
+    model.iter += 1
+    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    losses = model.get_current_losses()
+    metrics = tracker(output, losses)
+    # metrics = tracker.get_metrics()
+    metrics = tracker.finalise()
+    for k in ["train_acc", "train_macc"]:
+        assert metrics[k] == 50
+        np.testing.assert_allclose(metrics["train_miou"], 25, atol=1e-5)
+        assert metrics["train_loss_1"] == 1.5
 
-        for k in ["train_acc", "train_miou", "train_macc"]:
-            self.assertAlmostEqual(metrics[k], 100, 5)
+    tracker.reset("test")
+    model.iter += 1
+    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    losses = model.get_current_losses()
+    metrics = tracker(output, losses)
+    # metrics = tracker.get_metrics()
+    for name in ["test_acc", "test_miou", "test_macc"]:
+        np.testing.assert_allclose(metrics[name].item(), 0, atol=1e-5)
 
-        model.iter += 1
-        metrics = tracker(model)
-        # metrics = tracker.get_metrics()
-        metrics = tracker.finalise()
-        for k in ["train_acc", "train_macc"]:
-            self.assertEqual(metrics[k], 50)
-        self.assertAlmostEqual(metrics["train_miou"], 25, 5)
-        self.assertEqual(metrics["train_loss_1"], 1.5)
 
-        tracker.reset("test")
-        model.iter += 1
-        metrics = tracker(model)
+@pytest.mark.parametrize("finalise", [pytest.param(True), pytest.param(False)])
+def test_ignore_label(finalise):
+    tracker = SegmentationTracker(num_classes=2, ignore_label=-100)
+    tracker.reset("test")
+    model = MockModel()
+    model.iter = 3
+    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    losses = model.get_current_losses()
+    metrics = tracker(output, losses)
+    if not finalise:
         # metrics = tracker.get_metrics()
         for k in ["test_acc", "test_miou", "test_macc"]:
-            self.assertAlmostEqual(metrics[k].item(), 0, 5)
-
-    def test_ignore_label(self):
-        tracker = SegmentationTracker(num_classes=2, ignore_label=-100)
-        tracker.reset("test")
-        model = MockModel()
-        model.iter = 3
-        metrics = tracker(model)
-        # metrics = tracker.get_metrics()
-        for k in ["test_acc", "test_miou", "test_macc"]:
-            self.assertAlmostEqual(metrics[k], 100, 5)
-
-    def test_finalise(self):
-        tracker = SegmentationTracker(num_classes=2, ignore_label=-100)
-        tracker.reset("test")
-        model = MockModel()
-        model.iter = 3
-        tracker(output)
+            np.testing.assert_allclose(metrics[k], 100)
+    else:
         tracker.finalise()
-        with self.assertRaises(RuntimeError):
-            tracker(model)
+        with pytest.raises(RuntimeError):
+            tracker(output)
+
+
+    
