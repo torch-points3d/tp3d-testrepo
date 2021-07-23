@@ -4,6 +4,8 @@ import pytorch_lightning as pl
 import torch
 from pytorch_lightning.utilities import rank_zero_info
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
+from omegaconf import DictConfig
+import torch.nn.functional as F
 
 from torch_points3d.core.instantiator import Instantiator
 from torch_points3d.core.config import OptimizerConfig, SchedulerConfig
@@ -12,36 +14,73 @@ from torch_points3d.core.config import OptimizerConfig, SchedulerConfig
 class PointCloudBaseModel(pl.LightningModule):
     def __init__(
         self,
-        model: torch.nn.Module,
+        backbone: DictConfig,
         optimizer: OptimizerConfig,
-        scheduler: SchedulerConfig,
         instantiator: Instantiator,
+        data_module: pl.LightningDataModule,
+        scheduler: SchedulerConfig = None, # scheduler shouldn't be required
     ):
         super().__init__()
-        self.model = model
         # some optimizers/schedulers need parameters only known dynamically
         # allow users to override the getter to instantiate them lazily
         self.optimizer_cfg = optimizer
         self.scheduler_cfg = scheduler
         self.instantiator = instantiator
 
+        # need to pull these from the dataset to construct the model
+        self.num_classes = data_module.num_classes
+        self.feature_dimension = data_module.feature_dimension
+
+        self._build_model(backbone)
+
+    # overridable for child classes to create more complex models
+    # note that head, backbone, criterion, and loss are only used in
+    # _build_model, set_input, and forward
+    # so these three methods could be subclassed to create
+    # much more complicated models
+    def _build_model(self, backbone_cfg):
+        self.backbone = self.instantiator.backbone(backbone_cfg, self.feature_dimension)
+        self.head = torch.nn.Identity()
+
+        self.criterion = None
+        self.loss = None
+
+    def set_input(self, data):
+        self.batch_idx = data.batch.squeeze()
+        self.input = data
+        if data.y is not None:
+            self.labels = data.y
+        else:
+            self.labels = None
+    
+    def forward(self):
+        features = self.backbone(self.input).x
+        logits = self.head(features)
+        self.output = F.log_softmax(logits, dim=-1)
+
+        # only compute loss if loss is defined and the dset has labels
+        if self.labels is not None and self.criterion is not None:
+            return self.criterion(self.output, self.labels)
+            
     def configure_optimizers(self) -> Dict:
         """Prepare optimizer and scheduler"""
-        self.optimizer = self.instantiator.optimizer(self.model, self.optimizer_cfg)
-        # compute_warmup needs the datamodule to be available when `self.num_training_steps`
-        # is called that is why this is done here and not in the __init__
-        self.scheduler_cfg.num_training_steps, self.scheduler_cfg.num_warmup_steps = self.compute_warmup(
-            num_training_steps=self.scheduler_cfg.num_training_steps,
-            num_warmup_steps=self.scheduler_cfg.num_warmup_steps,
-        )
-        rank_zero_info(f"Inferring number of training steps, set to {self.scheduler_cfg.num_training_steps}")
-        rank_zero_info(f"Inferring number of warmup steps from ratio, set to {self.scheduler_cfg.num_warmup_steps}")
-        self.scheduler = self.instantiator.scheduler(self.scheduler_cfg, self.optimizer)
+        optims = {}
 
-        return {
-            "optimizer": self.optimizer,
-            "lr_scheduler": {"scheduler": self.scheduler, "interval": "step", "frequency": 1},
-        }
+        optims["optimizer"] = self.instantiator.optimizer(self, self.optimizer_cfg)
+
+        if self.scheduler_cfg is not None:
+            # compute_warmup needs the datamodule to be available when `self.num_training_steps`
+            # is called that is why this is done here and not in the __init__
+            self.scheduler_cfg.num_training_steps, self.scheduler_cfg.num_warmup_steps = self.compute_warmup(
+                num_training_steps=self.scheduler_cfg.num_training_steps,
+                num_warmup_steps=self.scheduler_cfg.num_warmup_steps,
+            )
+            rank_zero_info(f"Inferring number of training steps, set to {self.scheduler_cfg.num_training_steps}")
+            rank_zero_info(f"Inferring number of warmup steps from ratio, set to {self.scheduler_cfg.num_warmup_steps}")
+            scheduler = self.instantiator.scheduler(self.scheduler_cfg, self.optimizer)
+            optims["lr_scheduler"] = {"scheduler": scheduler, "interval": "step", "frequency": 1}
+
+        return optims
 
     @property
     def num_training_steps(self) -> int:
@@ -84,3 +123,15 @@ class PointCloudBaseModel(pl.LightningModule):
         This is called on fit start to have access to the data module,
         and initialize any data specific metrics.
         """
+
+    def training_step(self, batch, batch_idx):
+        self.set_input(batch)
+        return self.forward()
+
+    def validation_step(self, batch, batch_idx):
+        self.set_input(batch)
+        return self.forward()
+
+    def testing_step(self, batch, batch_idx):
+        self.set_input(batch)
+        return self.forward()

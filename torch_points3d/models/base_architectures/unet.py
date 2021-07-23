@@ -13,6 +13,7 @@ from torch.nn import (
     BatchNorm1d as BN,
     Dropout,
 )
+from torch_points3d.models.base_architectures.base_model import BaseModel
 from omegaconf.listconfig import ListConfig
 from omegaconf.dictconfig import DictConfig
 import logging
@@ -48,7 +49,7 @@ class BaseFactory:
 ############################# UNWRAPPED UNET BASE ###################################
 
 
-class UnwrappedUnetBasedModel(nn.Module):
+class UnwrappedUnetBasedModel(BaseModel):
     """Create a Unet unwrapped generator"""
 
     def _save_sampling_and_search(self, down_conv):

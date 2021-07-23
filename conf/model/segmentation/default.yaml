@@ -1,0 +1,8 @@
+# @package model
+defaults:
+  - /model/default
+
+_target_: torch_points3d.models.segmentation.base_model.SegmentationBaseModel
+
+backbone:
+  architecture: unet

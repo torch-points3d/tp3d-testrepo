@@ -135,7 +135,7 @@ class BaseSparseConv3d(UnwrappedUnetBasedModel):
         data:
             a dictionary that contains the data itself and its metadata information.
         """
-        self.input = sp3d.nn.SparseTensor(data.x, data.coords, data.batch)
+        self.input = sp3d.nn.SparseTensor(data.x, data.coords, data.batch, self.device)
         if data.pos is not None:
             self.xyz = data.pos
         else:
@@ -163,7 +163,7 @@ class SparseConv3dEncoder(BaseSparseConv3d):
         for i in range(len(self.down_modules)):
             data = self.down_modules[i](data)
 
-        out = Batch(x=data.F, batch=data.C[:, 0].long().to(data.F.device))
+        out = Batch(x=data.F, batch=data.C[:, 0].long())
         if not isinstance(self.inner_modules[0], Identity):
             out = self.inner_modules[0](out)
 

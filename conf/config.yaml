@@ -1,7 +1,5 @@
 defaults: # loads default configs
   - dataset: ???
-  - optimizer: sgd
-  - scheduler: default
   - model: ???
   - training: default
   - trainer: default
