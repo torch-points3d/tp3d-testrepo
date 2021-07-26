@@ -1,7 +1,10 @@
 from omegaconf import DictConfig
+from typing import Dict, Union
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch_geometric.data import Data
 
 from torch_points3d.core.instantiator import Instantiator
 from torch_points3d.models.base_model import PointCloudBaseModel
@@ -17,7 +20,7 @@ class SegmentationBaseModel(PointCloudBaseModel):
 
         self.head = nn.Sequential(nn.Linear(self.backbone.output_nc, num_classes))
 
-    def set_input(self, data):
+    def set_input(self, data: Data) -> None:
         self.batch_idx = data.batch.squeeze()
         self.input = data
         if data.y is not None:
@@ -25,11 +28,17 @@ class SegmentationBaseModel(PointCloudBaseModel):
         else:
             self.labels = None
 
-    def forward(self):
+    def forward(self) -> Union[torch.Tensor, None]:
         features = self.backbone(self.input).x
         logits = self.head(features)
         self.output = F.log_softmax(logits, dim=-1)
 
+        return self.get_losses()
+
+    def get_losses(self) -> Union[torch.Tensor, None]:
         # only compute loss if loss is defined and the dset has labels
-        if self.labels is not None and self.criterion is not None:
-            return self.criterion(self.output, self.labels)
+        if self.labels is None or self.criterion is None:
+            return
+
+        self.loss = self.criterion(self.output, self.labels)
+        return self.loss
