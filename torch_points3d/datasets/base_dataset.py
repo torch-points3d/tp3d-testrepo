@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, Optional, Sequence
 from dataclasses import dataclass
 
 import hydra
+import torch_geometric
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from torch_points3d.core.config import BaseDataConfig
@@ -24,7 +25,6 @@ class PointCloudDataModule(pl.LightningDataModule):
         self.ds = None
 
         self.cfg.dataroot = hydra.utils.to_absolute_path(self.cfg.dataroot)
-        print(self.cfg.dataroot)
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
@@ -54,7 +54,7 @@ class PointCloudDataModule(pl.LightningDataModule):
 
     @property
     def collate_fn(self) -> Optional[Callable]:
-        return None
+        return torch_geometric.data.batch.Batch.from_data_list
 
     @property
     def model_data_kwargs(self) -> Dict:

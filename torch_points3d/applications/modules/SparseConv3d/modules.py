@@ -3,7 +3,7 @@ import torch
 import sys
 
 from torch_points3d.core.common_modules import Seq, Identity
-import torch_points3d.modules.SparseConv3d.nn as snn
+import torch_points3d.applications.modules.SparseConv3d.nn as snn
 
 
 class ResBlock(torch.nn.Module):

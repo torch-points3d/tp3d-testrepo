@@ -1,7 +1,6 @@
 # @package dataset
-# cfg:
-  # torch data-loader specific arguments
 cfg: 
+  feature_dimension: 
   batch_size: ${training.batch_size}
   num_workers: ${training.num_workers}
   dataroot: data

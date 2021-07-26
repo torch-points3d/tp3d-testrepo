@@ -3,4 +3,6 @@ defaults:
   - segmentation/default
 _target_: torch_points3d.datasets.s3dis1x1.s3dis_data_module
 cfg:
+  num_classes: 13
+  feature_dimension: 6 # todo: able to calculate this dynamically
   fold: 5

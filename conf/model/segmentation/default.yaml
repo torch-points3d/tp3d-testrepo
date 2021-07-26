@@ -1,0 +1,14 @@
+# @package model
+defaults:
+  - /model/default
+
+model:
+  _recursive_: false
+  _target_: torch_points3d.models.segmentation.base_model.SegmentationBaseModel
+  num_classes: ${dataset.cfg.num_classes}
+  criterion:
+    _target_: torch.nn.NLLLoss
+
+  backbone:
+    input_nc: ${dataset.cfg.feature_dimension}
+    architecture: unet

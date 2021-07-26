@@ -1,6 +1,8 @@
+# @package model
+defaults:
+  - /optimizer: sgd
+  - /scheduler: 
 # By default we turn off recursive instantiation, allowing the user to instantiate themselves at the appropriate times.
 _recursive_: false
 
-_target_: torch_points3d.models.base_model.PointCloudBaseModel
-optimizer: ${optimizer}
-scheduler: ${scheduler}
+_target_: torch_points3d.tasks.base_model.PointCloudBaseModule
