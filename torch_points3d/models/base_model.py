@@ -1,4 +1,4 @@
-from typing import Union, Optional, Dict
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -12,7 +12,7 @@ class PointCloudBaseModel(nn.Module):
         super().__init__()
 
         self.instantiator = instantiator
-        self._losses: Dict[str, float]  = {}
+        self._losses: Dict[str, float] = {}
 
     def set_input(self, data: Data) -> None:
         raise (NotImplementedError("set_input needs to be defined!"))

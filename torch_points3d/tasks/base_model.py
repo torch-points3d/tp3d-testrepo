@@ -16,7 +16,7 @@ class PointCloudBaseModule(pl.LightningModule):
         optimizer: OptimizerConfig,
         instantiator: Instantiator,
         scheduler: SchedulerConfig = None,  # scheduler shouldn't be required
-        tracker: Optional[DictConfig] = None
+        tracker: Optional[DictConfig] = None,
     ):
         super().__init__()
         # some optimizers/schedulers need parameters only known dynamically

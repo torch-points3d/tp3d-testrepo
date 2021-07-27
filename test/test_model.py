@@ -18,9 +18,9 @@ from torch_points3d.core.instantiator import HydraInstantiator
 @pytest.mark.skip("For now we skip the tests...")
 def test_forward(self):
     option_dataset = OmegaConf.create({"feature_dimension": 1, "num_classes": 10})
-    option_criterion = OmegaConf.create({"_target_": "torch.nn.NLLLoss"}) 
+    option_criterion = OmegaConf.create({"_target_": "torch.nn.NLLLoss"})
     instantiator = HydraInstantiator()
-        
+
     model = SegmentationBaseModel(instantiator, 10, option_backbone, option_criterion)
 
     pos = torch.randn(1000, 3)
