@@ -1,18 +1,23 @@
+from typing import Union
+
+import torch
 import torch.nn as nn
-
-from omegaconf import DictConfig, OmegaConf
-
 from torch_geometric.data import Data
 
+from torch_points3d.core.instantiator import Instantiator
 
-class BaseModel(nn.Module):
-    def __init__(self, opt: DictConfig):
-        super(BaseModel, self).__init__()
-        self.opt = opt
 
-    def set_input(self, data: Data):
-        """Unpack input data from the dataloader and perform necessary pre-processing steps.
-        Parameters:
-            input (dict): includes the data itself and its metadata information.
-        """
-        raise NotImplementedError
+class PointCloudBaseModel(nn.Module):
+    def __init__(self, instantiator: Instantiator):
+        super().__init__()
+
+        self.instantiator = instantiator
+
+    def set_input(self, data: Data) -> None:
+        raise (NotImplementedError("set_input needs to be defined!"))
+
+    def forward(self) -> Union[torch.Tensor, None]:
+        raise (NotImplementedError("forward needs to be defined!"))
+
+    def get_losses(self) -> Union[torch.Tensor, None]:
+        raise (NotImplementedError("get_losses needs to be defined!"))

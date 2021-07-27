@@ -1,0 +1,6 @@
+# @package dataset
+defaults:
+  - /dataset/default
+
+cfg:
+  num_classes: 

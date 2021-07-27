@@ -6,12 +6,12 @@ import torch
 from torch_geometric.data import Batch
 
 from torch_points3d.applications.modelfactory import ModelFactory
-import torch_points3d.modules.SparseConv3d as sp3d
-from torch_points3d.modules.SparseConv3d.modules import *
+import torch_points3d.applications.modules.SparseConv3d as sp3d
+from torch_points3d.applications.modules.SparseConv3d.modules import *
 
 # from torch_points3d.core.base_conv.message_passing import *
 # from torch_points3d.core.base_conv.partial_dense import *
-from torch_points3d.models.base_architectures.unet import UnwrappedUnetBasedModel
+from torch_points3d.applications.base_architectures.unet import UnwrappedUnetBasedModel
 from torch_points3d.core.common_modules.base_modules import MLP
 
 from .utils import extract_output_nc
@@ -135,7 +135,7 @@ class BaseSparseConv3d(UnwrappedUnetBasedModel):
         data:
             a dictionary that contains the data itself and its metadata information.
         """
-        self.input = sp3d.nn.SparseTensor(data.x, data.coords, data.batch)
+        self.input = sp3d.nn.SparseTensor(data.x, data.coords, data.batch, self.device)
         if data.pos is not None:
             self.xyz = data.pos
         else:
@@ -163,7 +163,7 @@ class SparseConv3dEncoder(BaseSparseConv3d):
         for i in range(len(self.down_modules)):
             data = self.down_modules[i](data)
 
-        out = Batch(x=data.F, batch=data.C[:, 0].long().to(data.F.device))
+        out = Batch(x=data.F, batch=data.C[:, 0].long())
         if not isinstance(self.inner_modules[0], Identity):
             out = self.inner_modules[0](out)
 

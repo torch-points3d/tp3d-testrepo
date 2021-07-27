@@ -1,19 +1,10 @@
-defaults:
-  - task: ???
-  - models: ???
-  - data: ???
+defaults: # loads default configs
+  - dataset: ???
+  - model: ???
   - training: default
   - trainer: default
 
-job_name: benchmark
-model_name: ???
-update_lr_scheduler_on: "on_epoch" # ["on_epoch", "on_num_batch", "on_num_sample"]
-selection_stage: ""
-pretty_print: False
-eval_frequency: 1
-
-tracker_options:
-  # Extra options for the tracker
-  full_res: False
-  make_submission: False
-  track_boxes: False
+experiment_name: ${now:%Y-%m-%d}_${now:%H-%M-%S}
+log: False
+ignore_warnings: True # todo: check warnings before release
+pretty_print: True
