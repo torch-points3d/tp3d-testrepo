@@ -108,7 +108,7 @@ class SegmentationTracker(BaseTracker):
         macc = compute_mean_class_accuracy(matrix)
         miou = compute_average_intersection_union(matrix)
         iou_per_class, _ = compute_intersection_union_per_class(matrix, eps=self.eps)
-        iou_per_class_dict = {i: 100 * v for i, v in enumerate(iou_per_class)}
+        iou_per_class_dict = {i: (100 * v).item() for i, v in enumerate(iou_per_class)}
         return {
             "{}_acc".format(self.stage): 100 * acc,
             "{}_macc".format(self.stage): 100 * macc,
@@ -117,8 +117,8 @@ class SegmentationTracker(BaseTracker):
         }
 
     def track(self, output, **kwargs) -> Dict[str, Any]:
-        mask = output["targets"] != self._ignore_label
-        matrix = self.confusion_matrix_metric(output["preds"][mask], output["targets"][mask])
+        mask = output["labels"] != self._ignore_label
+        matrix = self.confusion_matrix_metric(output["preds"][mask], output["labels"][mask])
         segmentation_metrics = self.compute_metrics_from_cm(matrix)
         return segmentation_metrics
 

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional, Dict
 
 import torch
 import torch.nn as nn
@@ -12,12 +12,28 @@ class PointCloudBaseModel(nn.Module):
         super().__init__()
 
         self.instantiator = instantiator
+        self._losses: Dict[str, float]  = {}
 
     def set_input(self, data: Data) -> None:
         raise (NotImplementedError("set_input needs to be defined!"))
 
-    def forward(self) -> Union[torch.Tensor, None]:
+    def forward(self) -> Optional[torch.Tensor]:
         raise (NotImplementedError("forward needs to be defined!"))
 
-    def get_losses(self) -> Union[torch.Tensor, None]:
+    def compute_loss(self):
         raise (NotImplementedError("get_losses needs to be defined!"))
+
+    def get_losses(self, stage: Optional[str] = None) -> Optional[Dict["str", torch.Tensor]]:
+        if stage is None:
+            return self._losses
+        else:
+            losses = {}
+            for name, l in self._losses.items():
+                losses[f"{stage}_{name}"] = l.item()
+            return losses
+
+    def get_outputs(self) -> Dict[str, Optional[torch.Tensor]]:
+        """
+        return the outputs to track for the metrics
+        """
+        raise (NotImplementedError("outputs need to be defined"))

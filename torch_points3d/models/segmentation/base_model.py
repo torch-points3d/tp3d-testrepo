@@ -1,5 +1,5 @@
 from omegaconf import DictConfig
-from typing import Union
+from typing import Union, Optional, Dict
 
 import torch
 import torch.nn as nn
@@ -28,17 +28,26 @@ class SegmentationBaseModel(PointCloudBaseModel):
         else:
             self.labels = None
 
-    def forward(self) -> Union[torch.Tensor, None]:
+    def forward(self) -> Optional[torch.Tensor]:
         features = self.backbone(self.input).x
         logits = self.head(features)
-        self.output = F.log_softmax(logits, dim=-1)
+        self._output = F.log_softmax(logits, dim=-1)
+        self.compute_losses()
+        if "loss" in self._losses.keys():
+            return self._losses["loss"]
+        else:
+            return None
 
-        return self.get_losses()
+    def compute_losses(self):
+        """
+        compute every loss. store the total loss in an attribute _loss
+        """
+        if self.labels is not None and self.criterion is not None:
+            self._losses["loss"] = self.criterion(self._output, self.labels)
 
-    def get_losses(self) -> Union[torch.Tensor, None]:
-        # only compute loss if loss is defined and the dset has labels
-        if self.labels is None or self.criterion is None:
-            return
-
-        self.loss = self.criterion(self.output, self.labels)
-        return self.loss
+    def get_outputs(self) -> Dict[str, torch.Tensor]:
+        """
+        return the outputs to track for the metrics
+        """
+        return {"labels": self.labels, "preds": self._output}
+        

@@ -73,7 +73,7 @@ class MockModel:
 def test_forward():
     tracker = SegmentationTracker(num_classes=2, stage="train")
     model = MockModel()
-    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    output = {"preds": model.get_output(), "labels": model.get_labels()}
     losses = model.get_current_losses()
     metrics = tracker(output, losses)
     # metrics = tracker.get_metrics()
@@ -81,7 +81,7 @@ def test_forward():
     for k in ["train_acc", "train_miou", "train_macc"]:
         np.testing.assert_allclose(metrics[k], 100, rtol=1e-5)
     model.iter += 1
-    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    output = {"preds": model.get_output(), "labels": model.get_labels()}
     losses = model.get_current_losses()
     metrics = tracker(output, losses)
     # metrics = tracker.get_metrics()
@@ -93,7 +93,7 @@ def test_forward():
 
     tracker.reset("test")
     model.iter += 1
-    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    output = {"preds": model.get_output(), "labels": model.get_labels()}
     losses = model.get_current_losses()
     metrics = tracker(output, losses)
     # metrics = tracker.get_metrics()
@@ -107,7 +107,7 @@ def test_ignore_label(finalise):
     tracker.reset("test")
     model = MockModel()
     model.iter = 3
-    output = {"preds": model.get_output(), "targets": model.get_labels()}
+    output = {"preds": model.get_output(), "labels": model.get_labels()}
     losses = model.get_current_losses()
     metrics = tracker(output, losses)
     if not finalise:
