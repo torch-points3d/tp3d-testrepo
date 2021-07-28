@@ -11,10 +11,10 @@ ROOT = os.path.join(DIR, "..")
 sys.path.insert(0, ROOT)
 sys.path.append('.')
 
-from torch_points3d.metrics.segmentation.segmentation_tracker import compute_intersection_union_per_class
-from torch_points3d.metrics.segmentation.segmentation_tracker import compute_average_intersection_union
-from torch_points3d.metrics.segmentation.segmentation_tracker import compute_overall_accuracy
-from torch_points3d.metrics.segmentation.segmentation_tracker import compute_mean_class_accuracy
+from torch_points3d.metrics.segmentation.metrics import compute_intersection_union_per_class
+from torch_points3d.metrics.segmentation.metrics import compute_average_intersection_union
+from torch_points3d.metrics.segmentation.metrics import compute_overall_accuracy
+from torch_points3d.metrics.segmentation.metrics import compute_mean_class_accuracy
 
 
 

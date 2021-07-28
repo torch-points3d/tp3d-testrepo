@@ -98,7 +98,7 @@ class PointCloudBaseModule(pl.LightningModule):
     def _step(self, batch, batch_idx, stage: str):
         self.model.set_input(batch)
         loss = self.model.forward()
-        losses = self.model.get_losses(stage=stage)
+        losses = self.model.get_losses()
         outputs = self.model.get_outputs()
         metric_dict = self.tracker(outputs, losses)
         self.log_dict(metric_dict, prog_bar=True, on_step=False, on_epoch=True)

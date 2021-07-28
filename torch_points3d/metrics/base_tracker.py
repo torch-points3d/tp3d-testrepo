@@ -21,9 +21,9 @@ class BaseTracker(nn.Module):
     def track_loss(self, losses: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         out_loss = dict()
         for key, loss in losses.items():
-            loss_key = "%s_%s" % (self.stage, key)
-            if loss_key not in self.loss_metrics:
-                self.loss_metrics[loss_key] = AverageMeter()
+            loss_key = f"{self.stage}_{key}"
+            if loss_key not in self.loss_metrics.keys():
+                self.loss_metrics[loss_key] = AverageMeter().to(loss)
             val = self.loss_metrics[loss_key](loss)
             out_loss[loss_key] = val
         return out_loss
