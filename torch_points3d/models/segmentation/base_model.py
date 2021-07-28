@@ -1,5 +1,5 @@
 from omegaconf import DictConfig
-from typing import Union, Optional, Dict
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -50,4 +50,3 @@ class SegmentationBaseModel(PointCloudBaseModel):
         return the outputs to track for the metrics
         """
         return {"labels": self.labels, "preds": self._output}
-        
