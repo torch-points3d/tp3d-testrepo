@@ -23,9 +23,8 @@ class PointCloudBaseModel(nn.Module):
     def compute_loss(self):
         raise (NotImplementedError("get_losses needs to be defined!"))
 
-    def get_losses(self) -> Optional[Dict["str", torch.Tensor]]:        
+    def get_losses(self) -> Optional[Dict["str", torch.Tensor]]:
         return self._losses
-
 
     def get_outputs(self) -> Dict[str, Optional[torch.Tensor]]:
         """

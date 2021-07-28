@@ -1,5 +1,5 @@
 import torch
-from typing import Dict, Optional, Tuple, Any, Union
+from typing import Optional, Tuple, Union
 
 
 def compute_average_intersection_union(confusion_matrix: torch.Tensor, missing_as_one: bool = False) -> torch.Tensor:

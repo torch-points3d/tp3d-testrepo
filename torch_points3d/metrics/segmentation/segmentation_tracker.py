@@ -1,5 +1,5 @@
 import torch
-from typing import Dict, Optional, Tuple, Any, Union
+from typing import Any, Dict
 from torchmetrics import ConfusionMatrix
 from torchmetrics import Metric
 

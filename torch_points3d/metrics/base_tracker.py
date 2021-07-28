@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable, Optional
+from typing import Any, Dict, Optional
 import torch
 from torch import nn
 from torchmetrics import AverageMeter
