@@ -108,13 +108,14 @@ class SegmentationTracker(BaseTracker):
         macc = compute_mean_class_accuracy(matrix)
         miou = compute_average_intersection_union(matrix)
         iou_per_class, _ = compute_intersection_union_per_class(matrix, eps=self.eps)
-        iou_per_class_dict = {i: (100 * v).item() for i, v in enumerate(iou_per_class)}
-        return {
+        iou_per_class_dict = {f"{self.stage}_iou_class_{i}": (100 * v) for i, v in enumerate(iou_per_class)}
+        res = {
             "{}_acc".format(self.stage): 100 * acc,
             "{}_macc".format(self.stage): 100 * macc,
             "{}_miou".format(self.stage): 100 * miou,
-            "{}_iou_per_class".format(self.stage): iou_per_class_dict,
         }
+        res = dict(**res, **iou_per_class_dict)
+        return res
 
     def track(self, output, **kwargs) -> Dict[str, Any]:
         mask = output["labels"] != self._ignore_label
