@@ -57,8 +57,3 @@ class BaseTracker(nn.Module):
             metrics[key] = m.compute()
         self.loss_metrics = nn.ModuleDict()
         return metrics
-
-    def reset(self, stage: str = "train"):
-        self._finalised = False
-        self.stage = stage
-        self.loss_metrics = nn.ModuleDict()

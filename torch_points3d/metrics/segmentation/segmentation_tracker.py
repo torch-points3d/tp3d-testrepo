@@ -49,6 +49,3 @@ class SegmentationTracker(BaseTracker):
         matrix = self.confusion_matrix_metric.compute()
         segmentation_metrics = self.compute_metrics_from_cm(matrix)
         return segmentation_metrics
-
-    def reset(self, stage: str = "train"):
-        super().reset(stage)
