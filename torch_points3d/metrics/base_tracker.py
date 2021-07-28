@@ -13,7 +13,7 @@ class BaseTracker(nn.Module):
         super().__init__()
         self.stage: str = stage
         self._finalised: bool = False
-        self.loss_metrics: Dict[str, Callable] = dict()
+        self.loss_metrics: nn.ModuleDict = nn.ModuleDict()
 
     def track(self, output_model, *args, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError
@@ -55,10 +55,10 @@ class BaseTracker(nn.Module):
         metrics = dict()
         for key, m in self.loss_metrics.items():
             metrics[key] = m.compute()
-        self.loss_metrics = dict()
+        self.loss_metrics = nn.ModuleDict()
         return metrics
 
     def reset(self, stage: str = "train"):
         self._finalised = False
         self.stage = stage
-        self.loss_metrics = dict()
+        self.loss_metrics = nn.ModuleDict()
