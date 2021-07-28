@@ -32,11 +32,8 @@ class SegmentationBaseModel(PointCloudBaseModel):
         features = self.backbone(self.input).x
         logits = self.head(features)
         self._output = F.log_softmax(logits, dim=-1)
-        self.compute_losses()
-        if "loss" in self._losses.keys():
-            return self._losses["loss"]
-        else:
-            return None
+        loss = self.compute_losses()
+        return loss
 
     def compute_losses(self):
         """
@@ -44,6 +41,9 @@ class SegmentationBaseModel(PointCloudBaseModel):
         """
         if self.labels is not None and self.criterion is not None:
             self._losses["loss"] = self.criterion(self._output, self.labels)
+            return self._losses["loss"]
+        else:
+            return None
 
     def get_outputs(self) -> Dict[str, torch.Tensor]:
         """

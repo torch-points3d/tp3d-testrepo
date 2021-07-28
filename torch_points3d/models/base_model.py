@@ -23,14 +23,9 @@ class PointCloudBaseModel(nn.Module):
     def compute_loss(self):
         raise (NotImplementedError("get_losses needs to be defined!"))
 
-    def get_losses(self, stage: Optional[str] = None) -> Optional[Dict["str", torch.Tensor]]:
-        if stage is None:
-            return self._losses
-        else:
-            losses = {}
-            for name, l in self._losses.items():
-                losses[f"{stage}_{name}"] = l.item()
-            return losses
+    def get_losses(self) -> Optional[Dict["str", torch.Tensor]]:        
+        return self._losses
+
 
     def get_outputs(self) -> Dict[str, Optional[torch.Tensor]]:
         """
