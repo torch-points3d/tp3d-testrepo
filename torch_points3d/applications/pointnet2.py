@@ -1,6 +1,7 @@
 import os
 import sys
 from omegaconf import DictConfig, OmegaConf
+from typing import Optional
 import logging
 
 from torch_points3d.applications.modelfactory import ModelFactory
@@ -24,11 +25,11 @@ log = logging.getLogger(__name__)
 
 
 def PointNet2(
-    architecture: str = None,
-    input_nc: int = None,
-    num_layers: int = None,
-    config: DictConfig = None,
-    multiscale=False,
+    architecture: Optional[str] = None,
+    input_nc: Optional[int] = None,
+    num_layers: Optional[int] = None,
+    config: Optional[DictConfig] = None,
+    multiscale: bool = False,
     *args,
     **kwargs
 ):
