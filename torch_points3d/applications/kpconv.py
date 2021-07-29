@@ -3,12 +3,15 @@ from omegaconf import DictConfig, OmegaConf
 import logging
 
 from torch_points3d.applications.modelfactory import ModelFactory
+
 from torch_points3d.core.common_modules import FastBatchNorm1d
 from torch_points3d.applications.modules.KPConv import *
 from torch_points3d.core.base_conv.partial_dense import *
 from torch_points3d.models.base_architectures.unet import UnwrappedUnetBasedModel
-from torch_points3d.datasets.multiscale_data import MultiScaleBatch
 from torch_points3d.core.common_modules.base_modules import MLP
+
+from torch_points3d.datasets.multiscale_data import MultiScaleBatch
+
 from .utils import extract_output_nc
 
 
@@ -104,7 +107,6 @@ class BaseKPConv(UnwrappedUnetBasedModel):
         data:
             a dictionary that contains the data itself and its metadata information.
         """
-        data = data.to(self.device)
         if isinstance(data, MultiScaleBatch):
             self.pre_computed = data.multiscale
             self.upsample = data.upsample
