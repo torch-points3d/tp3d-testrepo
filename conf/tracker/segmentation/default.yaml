@@ -1,0 +1,2 @@
+_target_: torch_points3d.metrics.segmentation.segmentation_tracker.SegmentationTracker
+num_classes: ${dataset.cfg.num_classes}

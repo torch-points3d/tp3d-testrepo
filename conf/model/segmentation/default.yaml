@@ -1,6 +1,7 @@
 # @package model
 defaults:
   - /model/default
+  - /tracker: segmentation/default
 
 model:
   _recursive_: false

@@ -16,12 +16,14 @@ class PointCloudBaseModule(pl.LightningModule):
         optimizer: OptimizerConfig,
         instantiator: Instantiator,
         scheduler: SchedulerConfig = None,  # scheduler shouldn't be required
+        tracker: Optional[DictConfig] = None,
     ):
         super().__init__()
         # some optimizers/schedulers need parameters only known dynamically
         # allow users to override the getter to instantiate them lazily
         self.optimizer_cfg = optimizer
         self.scheduler_cfg = scheduler
+        self.tracker_cfg = tracker
         self.instantiator = instantiator
 
         self._init_model(model)
@@ -91,15 +93,22 @@ class PointCloudBaseModule(pl.LightningModule):
         This is called on fit start to have access to the data module,
         and initialize any data specific metrics.
         """
+        self.tracker = self.instantiator.tracker(self.tracker_cfg)
+
+    def _step(self, batch, batch_idx, stage: str):
+        self.model.set_input(batch)
+        loss = self.model.forward()
+        losses = self.model.get_losses()
+        outputs = self.model.get_outputs()
+        metric_dict = self.tracker(outputs, losses)
+        self.log_dict(metric_dict, prog_bar=True, on_step=False, on_epoch=True)
+        return loss
 
     def training_step(self, batch, batch_idx):
-        self.model.set_input(batch)
-        return self.model.forward()
+        return self._step(batch, batch_idx, "train")
 
     def validation_step(self, batch, batch_idx):
-        self.model.set_input(batch)
-        return self.model.forward()
+        return self._step(batch, batch_idx, "val")
 
     def testing_step(self, batch, batch_idx):
-        self.model.set_input(batch)
-        return self.model.forward()
+        return self._step(batch, batch_idx, "test")
