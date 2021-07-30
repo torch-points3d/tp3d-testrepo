@@ -1,6 +1,7 @@
 from typing import Any, Callable, Dict, Optional, Sequence
 from dataclasses import dataclass
 
+import numpy as np
 import hydra
 import torch_geometric
 import pytorch_lightning as pl
@@ -55,6 +56,41 @@ class PointCloudDataModule(pl.LightningDataModule):
     @property
     def collate_fn(self) -> Optional[Callable]:
         return torch_geometric.data.batch.Batch.from_data_list
+
+    @staticmethod
+    def _collate_fn(batch: Data, collate_fn: Callable, pre_collate_transform: Optional[Callable] = None):
+        if pre_collate_transform:
+            batch = pre_collate_transform(batch)
+        return collate_fn(batch)
+
+    @staticmethod
+    def _get_collate_function(conv_type: str, is_multiscale: bool, pre_collate_transform: Optional[Callable] = None):
+        is_dense = ConvolutionFormatFactory.check_is_dense_format(conv_type)
+        if is_multiscale:
+            if conv_type.lower() == ConvolutionFormat.PARTIAL_DENSE.value.lower():
+                fn = MultiScaleBatch.from_data_list
+            else:
+                raise NotImplementedError(
+                    "MultiscaleTransform is activated and supported only for partial_dense format"
+                )
+        else:
+            if is_dense:
+                fn = SimpleBatch.from_data_list
+            else:
+                fn = torch_geometric.data.batch.Batch.from_data_list
+        return partial(PointCloudDataModule._collate_fn, collate_fn=fn, pre_collate_transform=pre_collate_transform)
+
+    def _dataloader(self, dataset, pre_batch_collate_transform, conv_type, precompute_multi_scale, **kwargs):
+        batch_collate_function = self.__class__._get_collate_function(
+            conv_type, precompute_multi_scale, pre_batch_collate_transform
+        )
+        num_workers = self.cfg.num_workers
+        persistent_workers = (num_workers > 0)
+        dataloader = partial(
+            torch.utils.data.DataLoader, collate_fn=batch_collate_function, worker_init_fn=np.random.seed,
+            persistent_workers=persistent_workers
+        )
+        return dataloader(dataset, **kwargs)
 
     @property
     def model_data_kwargs(self) -> Dict:
