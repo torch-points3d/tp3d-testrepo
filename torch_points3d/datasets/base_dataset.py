@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torch_points3d.core.config import BaseDataConfig
+from torch_geometric.data import Data
 
 
 @dataclass
