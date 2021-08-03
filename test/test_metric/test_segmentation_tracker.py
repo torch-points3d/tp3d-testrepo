@@ -9,7 +9,7 @@ import pytest
 from torch_geometric.data import Data
 
 DIR = os.path.dirname(os.path.realpath(__file__))
-ROOT = os.path.join(DIR, "..")
+ROOT = os.path.join(DIR, "..", "..")
 sys.path.insert(0, ROOT)
 sys.path.append(".")
 
@@ -36,10 +36,10 @@ class MockModel:
     def __init__(self):
         self.iter = 0
         self.losses = [
-            {"loss_1": 1, "loss_2": 2},
-            {"loss_1": 2, "loss_2": 2},
-            {"loss_1": 1, "loss_2": 2},
-            {"loss_1": 1, "loss_2": 2},
+            {"loss_1": torch.tensor(1.), "loss_2": torch.tensor(2.)},
+            {"loss_1": torch.tensor(2.), "loss_2": torch.tensor(2.)},
+            {"loss_1": torch.tensor(1.), "loss_2": torch.tensor(2.)},
+            {"loss_1": torch.tensor(1.), "loss_2": torch.tensor(2.)},
         ]
         self.outputs = [
             torch.tensor([[0, 1], [0, 1]]),
@@ -91,7 +91,7 @@ def test_forward():
         np.testing.assert_allclose(metrics["train_miou"], 25, atol=1e-5)
         assert metrics["train_loss_1"] == 1.5
 
-    tracker.reset("test")
+    tracker = SegmentationTracker(num_classes=2, stage="test")
     model.iter += 1
     output = {"preds": model.get_output(), "labels": model.get_labels()}
     losses = model.get_current_losses()
@@ -103,8 +103,7 @@ def test_forward():
 
 @pytest.mark.parametrize("finalise", [pytest.param(True), pytest.param(False)])
 def test_ignore_label(finalise):
-    tracker = SegmentationTracker(num_classes=2, ignore_label=-100)
-    tracker.reset("test")
+    tracker = SegmentationTracker(num_classes=2, ignore_label=-100, stage="test")
     model = MockModel()
     model.iter = 3
     output = {"preds": model.get_output(), "labels": model.get_labels()}
