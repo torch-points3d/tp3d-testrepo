@@ -5,6 +5,7 @@ import numpy as np
 import hydra
 import torch_geometric
 import pytorch_lightning as pl
+from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torch_points3d.core.config import BaseDataConfig
 
@@ -80,7 +81,7 @@ class PointCloudDataModule(pl.LightningDataModule):
                 fn = torch_geometric.data.batch.Batch.from_data_list
         return partial(PointCloudDataModule._collate_fn, collate_fn=fn, pre_collate_transform=pre_collate_transform)
 
-    def _dataloader(self, dataset, pre_batch_collate_transform, conv_type, precompute_multi_scale, **kwargs):
+    def _dataloader(self, dataset: Dataset, pre_batch_collate_transform: Optional[Callable], conv_type: str, precompute_multi_scale: bool, **kwargs):
         batch_collate_function = self.__class__._get_collate_function(
             conv_type, precompute_multi_scale, pre_batch_collate_transform
         )
