@@ -6,10 +6,10 @@ import numpy as np
 import os
 import sys
 
-ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..")
 sys.path.append(ROOT)
 
-from torch_points3d.datasets.batch import SimpleBatch
+from torch_points3d.data.batch import SimpleBatch
 
 
 

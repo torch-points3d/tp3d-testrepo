@@ -1,5 +1,6 @@
 from typing import Any, Callable, Dict, Optional, Sequence
 from dataclasses import dataclass
+from functools import partial
 
 import numpy as np
 import hydra
@@ -9,6 +10,8 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torch_points3d.core.config import BaseDataConfig
 from torch_geometric.data import Data
+from torch_points3d.data.multiscale_data import MultiScaleBatch
+from torch_points3d.data.batch import SimpleBatch
 
 
 @dataclass
@@ -25,30 +28,26 @@ class PointCloudDataModule(pl.LightningDataModule):
     def __init__(self, cfg: PointCloudDataConfig = PointCloudDataConfig()) -> None:
         super().__init__()
         self.cfg = cfg
-        self.ds = None
+        self.train_datset: Optional[Dataset] = None
+        self.val_dataset: Optional[Dataset] = None
+        self.test_dataset: Optional[Dataset] = None
 
         self.cfg.dataroot = hydra.utils.to_absolute_path(self.cfg.dataroot)
 
     def train_dataloader(self) -> DataLoader:
-        return DataLoader(
-            self.ds["train"], batch_size=self.batch_size, num_workers=self.cfg.num_workers, collate_fn=self.collate_fn,
+        return self._dataLoader(
+            self.train_dataset
         )
 
     def val_dataloader(self) -> DataLoader:
-        return DataLoader(
-            self.ds["validation"],
-            batch_size=self.batch_size,
-            num_workers=self.cfg.num_workers,
-            collate_fn=self.collate_fn,
+        return self._dataLoader(
+            self.val_dataset
         )
 
     def test_dataloader(self) -> Optional[DataLoader]:
         if "test" in self.ds:
-            return DataLoader(
-                self.ds["test"],
-                batch_size=self.batch_size,
-                num_workers=self.cfg.num_workers,
-                collate_fn=self.collate_fn,
+            return self._dataLoader(
+                self.test_dataset
             )
 
     @property
@@ -67,7 +66,7 @@ class PointCloudDataModule(pl.LightningDataModule):
 
     @staticmethod
     def _get_collate_function(conv_type: str, is_multiscale: bool, pre_collate_transform: Optional[Callable] = None):
-        is_dense = ConvolutionFormatFactory.check_is_dense_format(conv_type)
+        is_dense: bool = ConvolutionFormatFactory.check_is_dense_format(conv_type)
         if is_multiscale:
             if conv_type.lower() == ConvolutionFormat.PARTIAL_DENSE.value.lower():
                 fn = MultiScaleBatch.from_data_list
@@ -88,9 +87,12 @@ class PointCloudDataModule(pl.LightningDataModule):
         )
         num_workers = self.cfg.num_workers
         persistent_workers = (num_workers > 0)
+        
         dataloader = partial(
-            torch.utils.data.DataLoader, collate_fn=batch_collate_function, worker_init_fn=np.random.seed,
-            persistent_workers=persistent_workers
+            DataLoader, collate_fn=batch_collate_function, worker_init_fn=np.random.seed,
+            persistent_workers=persistent_workers,
+            batch_size=self.batch_size,
+            num_workers=num_workers
         )
         return dataloader(dataset, **kwargs)
 
