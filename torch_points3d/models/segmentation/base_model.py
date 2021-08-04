@@ -11,7 +11,7 @@ from torch_points3d.models.base_model import PointCloudBaseModel
 
 
 class SegmentationBaseModel(PointCloudBaseModel):
-    def __init__(self, instantiator: Instantiator, num_classes: int, backbone: DictConfig, criterion: DictConfig):
+    def __init__(self, instantiator: Instantiator, num_classes: int, backbone: DictConfig, criterion: DictConfig, conv_type: Optional[str] = None):
         super().__init__(instantiator)
 
         print(backbone)

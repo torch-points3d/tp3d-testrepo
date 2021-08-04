@@ -13,3 +13,4 @@ model:
   backbone:
     input_nc: ${dataset.cfg.feature_dimension}
     architecture: unet
+  conv_type: null

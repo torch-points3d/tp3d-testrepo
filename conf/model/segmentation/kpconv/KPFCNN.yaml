@@ -2,11 +2,11 @@
 defaults:
   - /model/segmentation/default
 
-model: 
+model:
+  conv_type: "PARTIAL_DENSE"
   backbone:
     _target_: torch_points3d.applications.kpconv.KPConv
     config:
-      conv_type: "PARTIAL_DENSE"
       define_constants:
         in_grid_size: 0.02
         in_feat: 64

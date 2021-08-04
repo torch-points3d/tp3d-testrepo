@@ -2,11 +2,11 @@
 defaults:
   - /model/segmentation/default
 
-model: 
+model:
+  conv_type: "DENSE"
   backbone:
     _target_: torch_points3d.applications.pointnet2.PointNet2
     config:
-      conv_type: "DENSE"
       down_conv:
         module_name: PointNetMSGDown
         npoint: [1024, 256, 64, 16]

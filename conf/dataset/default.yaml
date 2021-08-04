@@ -4,6 +4,7 @@ cfg:
   batch_size: ${training.batch_size}
   num_workers: ${training.num_workers}
   dataroot: data
+  conv_type: ${model.model.conv_type}
 
   common_transform:
   aug_transform:

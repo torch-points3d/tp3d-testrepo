@@ -31,26 +31,23 @@ class PointCloudDataModule(pl.LightningDataModule):
     def __init__(self, cfg: PointCloudDataConfig = PointCloudDataConfig()) -> None:
         super().__init__()
         self.cfg = cfg
-        self.train_datset: Optional[Dataset] = None
-        self.val_dataset: Optional[Dataset] = None
-        self.test_dataset: Optional[Dataset] = None
-
+        self.ds: Optional[Dict[str, Dataset]] = None
         self.cfg.dataroot = hydra.utils.to_absolute_path(self.cfg.dataroot)
 
     def train_dataloader(self) -> DataLoader:
-        return self._dataLoader(
-            self.train_dataset
+        return self._dataloader(
+            self.ds["train"]
         )
 
     def val_dataloader(self) -> DataLoader:
-        return self._dataLoader(
-            self.val_dataset
+        return self._dataloader(
+            self.ds["validation"]
         )
 
     def test_dataloader(self) -> Optional[DataLoader]:
-        if "test" in self.ds:
-            return self._dataLoader(
-                self.test_dataset
+        if "test" in self.ds.keys():
+            return self._dataloader(
+                self.ds["test"]
             )
 
     @property
@@ -84,7 +81,7 @@ class PointCloudDataModule(pl.LightningDataModule):
                 fn = torch_geometric.data.batch.Batch.from_data_list
         return partial(PointCloudDataModule._collate_fn, collate_fn=fn, pre_collate_transform=pre_collate_transform)
 
-    def _dataloader(self, dataset: Dataset, pre_batch_collate_transform: Optional[Callable], conv_type: str, precompute_multi_scale: bool, **kwargs):
+    def _dataloader(self, dataset: Dataset, pre_batch_collate_transform: Optional[Callable] = None, conv_type: str = "partial_dense", precompute_multi_scale: bool = False, **kwargs):
         batch_collate_function = self.__class__._get_collate_function(
             conv_type, precompute_multi_scale, pre_batch_collate_transform
         )

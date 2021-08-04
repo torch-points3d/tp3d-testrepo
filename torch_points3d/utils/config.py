@@ -12,7 +12,6 @@ from omegaconf.listconfig import ListConfig
 from omegaconf.dictconfig import DictConfig
 from .enums import ConvolutionFormat
 from torch_points3d.utils.debugging_vars import DEBUGGING_VARS
-from torch_points3d.utils.colors import COLORS, colored_print
 import subprocess
 
 log = logging.getLogger(__name__)
