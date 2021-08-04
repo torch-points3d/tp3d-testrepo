@@ -33,8 +33,7 @@ def test_forward(self):
     model.forward()
 
 
-def test_s3dis_run():
+def test_s3dis_run(script_runner):
     model = "segmentation/sparseconv3d/ResUNet32"
     dataset = "segmentation/s3dis/s3dis1x1"
-    script = ScriptRunner()
-    script.hf_train(dataset=dataset, model=model)
+    script_runner.hf_train(dataset=dataset, model=model)

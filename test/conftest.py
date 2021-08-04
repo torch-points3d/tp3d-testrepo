@@ -40,8 +40,12 @@ class ScriptRunner:
         cmd_args = []
         cmd_args.extend([
             f'model={model}',
-            f'dataset={dataset}'
+            f'dataset={dataset}',
+            f'trainer.max_epochs=2'
         ])
         self.train(cmd_args)
 
 
+@pytest.fixture(scope="session")
+def script_runner() -> ScriptRunner:
+    return ScriptRunner()
