@@ -13,6 +13,9 @@ from torch_geometric.data import Data
 from torch_points3d.data.multiscale_data import MultiScaleBatch
 from torch_points3d.data.batch import SimpleBatch
 
+from torch_points3d.utils.enums import ConvolutionFormat
+from torch_points3d.utils.config import ConvolutionFormatFactory
+
 
 @dataclass
 class PointCloudDataConfig(BaseDataConfig):
