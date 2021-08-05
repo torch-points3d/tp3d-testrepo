@@ -7,10 +7,10 @@ import torch
 from torch_geometric.data import Data
 from torch.utils.data import Dataset
 
-from torch_points3d.datasets.base_dataset import PointCloudDataModule
+from torch_points3d.datasets.base_dataset import PointCloudDataModule, PointCloudDataConfig
 
 @dataclass
-class MockConfig:
+class MockConfig(PointCloudDataConfig):
     batch_size: int = 16
     num_workers: int = 0
     size: int = 3
@@ -69,7 +69,7 @@ class MockDataLoader(PointCloudDataModule):
                           pytest.param("partial_dense", True, True, marks=pytest.mark.xfail),
                           pytest.param("sparse", True, False),
                          ])
-def test_datasets(conv_type="dense", is_same_size=True, size=3, multiscale=False, num_classes=2, batch_size=16):
+def test_datasets(conv_type, is_same_size, size, multiscale, num_classes, batch_size):
     cfg = MockConfig(conv_type=conv_type, is_same_size=is_same_size, size=size, multiscale=multiscale, num_classes=2, batch_size=batch_size)
     dataloader = MockDataLoader(cfg)
 
@@ -81,14 +81,16 @@ def test_datasets(conv_type="dense", is_same_size=True, size=3, multiscale=False
 
     # test batch collate
     batch = next(iter(train_dataloader))
+    
     num_samples = PointCloudDataModule.get_num_samples(batch, conv_type)
-    np.testing.assert_equal(num_samples, batch_size)
+    np.testing.assert_equal(num_samples, min(batch_size, size))
     if(is_same_size):
         if(conv_type.lower() == "dense"):
             np.testing.assert_equal(batch.pos.size(1), 1000)
         else:
-            for i in range(batch_size):
-                np.testing.assert_equal(len(batch.pos[batch.batch == i]), 1000)
-    if(is_multiscale):
-        # test downsample and upsample are 
+            for i in range(min(batch_size, size)):
+                np.testing.assert_equal(batch.pos[batch.batch == i].shape[0], 1000)
+    if(multiscale):
+        # test downsample and upsample are
+        pass
 

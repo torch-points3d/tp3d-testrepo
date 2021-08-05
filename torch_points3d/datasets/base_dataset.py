@@ -37,18 +37,18 @@ class PointCloudDataModule(pl.LightningDataModule):
 
     def train_dataloader(self) -> DataLoader:
         return self._dataloader(
-            self.ds["train"]
+            self.ds["train"], conv_type=self.cfg.conv_type
         )
 
     def val_dataloader(self) -> DataLoader:
         return self._dataloader(
-            self.ds["validation"]
+            self.ds["validation"], conv_type=self.cfg.conv_type
         )
 
     def test_dataloader(self) -> Optional[DataLoader]:
         if "test" in self.ds.keys():
             return self._dataloader(
-                self.ds["test"]
+                self.ds["test"], conv_type=self.cfg.conv_type
             )
 
     @property
@@ -65,7 +65,7 @@ class PointCloudDataModule(pl.LightningDataModule):
         if is_dense:
             return batch.pos.shape[0]
         else:
-            return batch.batch.max() + 1
+            return (batch.batch.max() + 1).item()
 
     @staticmethod
     def _collate_fn(batch: Data, collate_fn: Callable, pre_collate_transform: Optional[Callable] = None):
