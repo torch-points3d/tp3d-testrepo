@@ -3,7 +3,7 @@ import os
 import os.path as osp
 import pytest
 
-from hydra.experimental import compose, initialize
+from hydra import compose, initialize
 from hydra.test_utils.test_utils import find_parent_dir_containing
 
 from torch_points3d.trainer import LitTrainer
@@ -41,7 +41,8 @@ class ScriptRunner:
         cmd_args.extend([
             f'model={model}',
             f'dataset={dataset}',
-            f'trainer.max_epochs=2'
+            f'trainer.max_epochs=1',
+            f'training.num_workers=1'
         ])
         self.train(cmd_args)
 

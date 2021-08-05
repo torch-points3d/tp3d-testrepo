@@ -22,6 +22,7 @@ class PointCloudDataConfig(BaseDataConfig):
     batch_size: int = 32
     num_workers: int = 0
     dataroot: str = "data"
+    conv_type: str = "dense"
     pre_transform: Sequence[Any] = None
     train_transform: Sequence[Any] = None
     test_transform: Sequence[Any] = None
@@ -57,6 +58,14 @@ class PointCloudDataModule(pl.LightningDataModule):
     @property
     def collate_fn(self) -> Optional[Callable]:
         return torch_geometric.data.batch.Batch.from_data_list
+
+    @staticmethod
+    def get_num_samples(batch, conv_type):
+        is_dense = ConvolutionFormatFactory.check_is_dense_format(conv_type)
+        if is_dense:
+            return batch.pos.shape[0]
+        else:
+            return batch.batch.max() + 1
 
     @staticmethod
     def _collate_fn(batch: Data, collate_fn: Callable, pre_collate_transform: Optional[Callable] = None):

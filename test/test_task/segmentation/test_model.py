@@ -9,7 +9,7 @@ from torch_geometric.data import Batch
 
 from torch_points3d.models.segmentation.base_model import SegmentationBaseModel
 from torch_points3d.core.instantiator import HydraInstantiator
-from .conftest import ScriptRunner
+
 
 @pytest.mark.skip("For now we skip the tests...")
 def test_forward(self):
@@ -28,7 +28,7 @@ def test_forward(self):
     model.set_input(data)
     model.forward()
 
-
+@pytest.mark.slow
 def test_s3dis_run(script_runner):
     model = "segmentation/sparseconv3d/ResUNet32"
     dataset = "segmentation/s3dis/s3dis1x1"
