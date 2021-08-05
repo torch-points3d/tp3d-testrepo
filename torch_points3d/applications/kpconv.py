@@ -7,10 +7,10 @@ from torch_points3d.applications.modelfactory import ModelFactory
 from torch_points3d.core.common_modules import FastBatchNorm1d
 from torch_points3d.applications.modules.KPConv import *
 from torch_points3d.core.base_conv.partial_dense import *
-from torch_points3d.models.base_architectures.unet import UnwrappedUnetBasedModel
+from torch_points3d.applications.base_architectures.unet import UnwrappedUnetBasedModel
 from torch_points3d.core.common_modules.base_modules import MLP
 
-from torch_points3d.datasets.multiscale_data import MultiScaleBatch
+from torch_points3d.data.multiscale_data import MultiScaleBatch
 
 from .utils import extract_output_nc
 
@@ -60,7 +60,7 @@ class KPConvFactory(ModelFactory):
             model_config = OmegaConf.load(path_to_model)
         ModelFactory.resolve_model(model_config, self.num_features, self._kwargs)
         modules_lib = sys.modules[__name__]
-        return KPConvUnet(model_config, None, None, modules_lib, **self.kwargs)
+        return KPConvUnet(model_config, None, modules_lib, **self.kwargs)
 
     def _build_encoder(self):
         if self._config:
@@ -70,14 +70,14 @@ class KPConvFactory(ModelFactory):
             model_config = OmegaConf.load(path_to_model)
         ModelFactory.resolve_model(model_config, self.num_features, self._kwargs)
         modules_lib = sys.modules[__name__]
-        return KPConvEncoder(model_config, None, None, modules_lib, **self.kwargs)
+        return KPConvEncoder(model_config, None, modules_lib, **self.kwargs)
 
 
 class BaseKPConv(UnwrappedUnetBasedModel):
     CONV_TYPE = "partial_dense"
 
-    def __init__(self, model_config, model_type, dataset, modules, *args, **kwargs):
-        super(BaseKPConv, self).__init__(model_config, model_type, dataset, modules)
+    def __init__(self, model_config, model_type, modules, *args, **kwargs):
+        super(BaseKPConv, self).__init__(model_config, model_type, modules)
         try:
             default_output_nc = extract_output_nc(model_config)
         except:

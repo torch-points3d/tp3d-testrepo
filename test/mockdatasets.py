@@ -1,12 +1,13 @@
 import numpy as np
 import torch
+from typing import Callable, Optional
 from torch.utils.data import Dataset
 from torch_geometric.data import Data, Batch
 
-from torch_points3d.datasets.batch import SimpleBatch
-from torch_points3d.core.data_transform import MultiScaleTransform
-from torch_points3d.datasets.multiscale_data import MultiScaleBatch
-from torch_points3d.datasets.registration.pair import Pair, PairBatch, PairMultiScaleBatch, DensePairBatch
+from torch_points3d.data.batch import SimpleBatch
+# from torch_points3d.core.data_transform import MultiScaleTransform
+from torch_points3d.data.multiscale_data import MultiScaleBatch
+from torch_points3d.data.pair import Pair, PairBatch, PairMultiScaleBatch, DensePairBatch
 
 
 class MockDatasetConfig(object):
@@ -93,7 +94,8 @@ class MockDataset(torch.utils.data.Dataset):
 
     def set_strategies(self, model):
         strategies = model.get_spatial_ops()
-        transform = MultiScaleTransform(strategies)
+        transform = None
+        # transform = MultiScaleTransform(strategies)
         self._ms_transform = transform
 
 

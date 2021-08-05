@@ -11,7 +11,7 @@ from torch_points3d.core.base_conv.dense import DenseFPModule
 from torch_points3d.applications.base_architectures.unet import UnwrappedUnetBasedModel
 
 # Must add multiscale batch
-from torch_points3d.datasets.multiscale_data import MultiScaleBatch
+from torch_points3d.data.multiscale_data import MultiScaleBatch
 
 from torch_points3d.core.common_modules.dense_modules import Conv1D
 from torch_points3d.core.common_modules.base_modules import Seq
@@ -71,7 +71,7 @@ class PointNet2Factory(ModelFactory):
             model_config = OmegaConf.load(path_to_model)
         ModelFactory.resolve_model(model_config, self.num_features, self._kwargs)
         modules_lib = sys.modules[__name__]
-        return PointNet2Unet(model_config, None, None, modules_lib, **self.kwargs)
+        return PointNet2Unet(model_config, None, modules_lib, **self.kwargs)
 
     def _build_encoder(self):
         if self._config:
