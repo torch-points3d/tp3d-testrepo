@@ -20,7 +20,7 @@ class MockConfig(PointCloudDataConfig):
     num_classes: int = 2
 
 
-class MockDataset(Dataset):
+class SegmentationMockDataset(Dataset):
     def __init__(self, train: bool = True, transform: Optional[Callable] = None, size: int = 3, is_same_size: bool = True, num_classes:int = 2):
         self.train = train
         self.transform = transform
@@ -39,15 +39,16 @@ class MockDataset(Dataset):
             pos = torch.randn(size_pt, 3).float()
         else:
             pos = (idx * torch.ones(size_pt, 3)).float()
+        x = torch.ones(size_pt, 1).float()
         y = torch.randint(0, self.num_classes, (size_pt,)).float()
-        data = Data(pos=pos, y=y)
+        data = Data(pos=pos, y=y, x=x)
         if self.transform is not None:
             data = self.transform(data)
         return data
 
 
 
-class MockDataLoader(PointCloudDataModule):
+class SegmentationMockDataLoader(PointCloudDataModule):
 
     def __init__(self, cfg, transform: Optional[Callable] = None):
         super().__init__(cfg)
@@ -81,7 +82,6 @@ def test_datasets(conv_type, is_same_size, size, multiscale, num_classes, batch_
 
     # test batch collate
     batch = next(iter(train_dataloader))
-    
     num_samples = PointCloudDataModule.get_num_samples(batch, conv_type)
     np.testing.assert_equal(num_samples, min(batch_size, size))
     if(is_same_size):
