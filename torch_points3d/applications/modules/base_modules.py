@@ -1,4 +1,6 @@
+from typing import Dict, Any
 import torch
+from abc import abstractmethod
 
 
 class BaseInternalLossModule(torch.nn.Module):
