@@ -36,10 +36,10 @@ class MockModel:
     def __init__(self):
         self.iter = 0
         self.losses = [
-            {"loss_1": torch.tensor(1.), "loss_2": torch.tensor(2.)},
-            {"loss_1": torch.tensor(2.), "loss_2": torch.tensor(2.)},
-            {"loss_1": torch.tensor(1.), "loss_2": torch.tensor(2.)},
-            {"loss_1": torch.tensor(1.), "loss_2": torch.tensor(2.)},
+            {"loss_1": torch.tensor(1.0), "loss_2": torch.tensor(2.0)},
+            {"loss_1": torch.tensor(2.0), "loss_2": torch.tensor(2.0)},
+            {"loss_1": torch.tensor(1.0), "loss_2": torch.tensor(2.0)},
+            {"loss_1": torch.tensor(1.0), "loss_2": torch.tensor(2.0)},
         ]
         self.outputs = [
             torch.tensor([[0, 1], [0, 1]]),

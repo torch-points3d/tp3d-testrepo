@@ -1,6 +1,4 @@
 import pytest
-import sys
-import os
 import torch
 from omegaconf import OmegaConf
 
@@ -27,6 +25,7 @@ def test_forward(self):
     data = Batch(pos=pos, x=x, batch=batch, y=y, coords=coords)
     model.set_input(data)
     model.forward()
+
 
 @pytest.mark.slow
 def test_s3dis_run(script_runner):

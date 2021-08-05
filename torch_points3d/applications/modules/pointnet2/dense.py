@@ -5,6 +5,7 @@ import torch_points_kernels as tp
 
 from torch_points3d.core.base_conv.dense import *
 from torch_points3d.core.spatial_ops import DenseRadiusNeighbourFinder, DenseFPSSampler
+
 # from torch_points3d.utils.model_building_utils.activation_resolver import get_activation
 
 
@@ -54,7 +55,7 @@ class PointNetMSGDown(BaseDenseConvolutionDown):
         return new_features
 
     def conv(self, x, pos, new_pos, radius_idx, scale_idx):
-        """ Implements a Dense convolution where radius_idx represents
+        """Implements a Dense convolution where radius_idx represents
         the indexes of the points in x and pos to be agragated into the new feature
         for each point in new_pos
 
