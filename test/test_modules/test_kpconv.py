@@ -1,14 +1,9 @@
-import os
-import sys
-import unittest
 import numpy as np
 import numpy.testing as npt
 import torch
 
 
-
 from torch_points3d.applications.modules.KPConv.losses import repulsion_loss, fitting_loss, permissive_loss
-
 
 
 def test_permissive_loss():
@@ -16,6 +11,7 @@ def test_permissive_loss():
     pos_t = torch.from_numpy(pos_n)
     loss = permissive_loss(pos_t, 1).item()
     assert loss == np.sqrt(2)
+
 
 def test_fitting_loss():
     pos_n = np.asarray([[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]]).astype(np.float)
@@ -28,6 +24,7 @@ def test_fitting_loss():
     sq_distances = torch.sum(differences ** 2, dim=-1).unsqueeze(0)
     loss = fitting_loss(sq_distances, 1).item()
     assert loss == 0.5
+
 
 def test_repulsion_loss():
     pos_n = np.asarray([[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]]).astype(np.float64)
