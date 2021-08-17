@@ -55,10 +55,6 @@ class PointCloudDataModule(pl.LightningDataModule):
     def batch_size(self) -> int:
         return self.cfg.batch_size
 
-    @property
-    def collate_fn(self) -> Optional[Callable]:
-        return torch_geometric.data.batch.Batch.from_data_list
-
     @staticmethod
     def get_num_samples(batch, conv_type):
         is_dense = ConvolutionFormatFactory.check_is_dense_format(conv_type)

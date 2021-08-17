@@ -44,7 +44,7 @@ class SegmentationMockDataLoader(PointCloudDataModule):
                          ])
 def test_dataloader(conv_type, is_same_size, size, multiscale, num_classes, batch_size):
     cfg = MockConfig(conv_type=conv_type, is_same_size=is_same_size, size=size, multiscale=multiscale, num_classes=2, batch_size=batch_size)
-    dataloader = MockDataLoader(cfg)
+    dataloader = SegmentationMockDataLoader(cfg)
 
     train_dataloader = dataloader.train_dataloader()
     val_dataloader = dataloader.val_dataloader()
