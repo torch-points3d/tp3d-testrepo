@@ -1,15 +1,9 @@
 import pytest
-import sys
-import os
 import torch
 from omegaconf import OmegaConf
 
 from torch_geometric.data import Batch
 
-DIR = os.path.dirname(os.path.realpath(__file__))
-ROOT = os.path.join(DIR, "..")
-sys.path.insert(0, ROOT)
-sys.path.append(".")
 
 from torch_points3d.models.segmentation.base_model import SegmentationBaseModel
 from torch_points3d.core.instantiator import HydraInstantiator
@@ -31,3 +25,10 @@ def test_forward(self):
     data = Batch(pos=pos, x=x, batch=batch, y=y, coords=coords)
     model.set_input(data)
     model.forward()
+
+
+@pytest.mark.slow
+def test_s3dis_run(script_runner):
+    model = "segmentation/sparseconv3d/ResUNet32"
+    dataset = "segmentation/s3dis/s3dis1x1"
+    script_runner.hf_train(dataset=dataset, model=model)

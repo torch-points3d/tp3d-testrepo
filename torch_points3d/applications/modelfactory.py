@@ -2,7 +2,7 @@ from enum import Enum
 from omegaconf import DictConfig
 import logging
 
-from torch_points3d.utils.model_building_utils.model_definition_resolver import resolve
+ from torch_points3d.utils.model_building_utils.model_definition_resolver import resolve
 
 log = logging.getLogger(__name__)
 

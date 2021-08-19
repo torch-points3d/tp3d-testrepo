@@ -71,3 +71,19 @@ def SparseTensor(feats, coordinates, batch, device=torch.device("cpu")):
         batch = batch.unsqueeze(-1)
     coords = torch.cat([coordinates.int(), batch.int()], -1)
     return TS.SparseTensor(feats, coords).to(device)
+
+
+class TorchSparseNonLinearityBase(torch.nn.Module):
+    def __init__(module):
+        super(TorchSparseNonLinearityBase, self).__init__()
+        self.module = module
+
+    def forward(self, input: TS.SparseTensor):
+        return TS.nn.utils.fapply(input, self.module)
+
+
+def create_activation_function(activation: torch.nn.Module = torch.nn.ReLU()):
+    """
+    create an TS activation function from a torch.nn activation function
+    """
+    return TorchSparseNonLinearityBase(module=activation)
