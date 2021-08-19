@@ -5,7 +5,7 @@ from typing import Optional
 import logging
 
 from torch_points3d.applications.modelfactory import ModelFactory
-from torch_points3d.applications.modules.pointnet2 import *
+from torch_points3d.modules.pointnet2 import *
 from torch_points3d.core.base_conv.dense import DenseFPModule
 
 from torch_points3d.applications.base_architectures.unet import UnwrappedUnetBasedModel

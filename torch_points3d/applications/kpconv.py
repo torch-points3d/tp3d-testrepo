@@ -5,7 +5,7 @@ import logging
 from torch_points3d.applications.modelfactory import ModelFactory
 
 from torch_points3d.core.common_modules import FastBatchNorm1d
-from torch_points3d.applications.modules.KPConv import *
+from torch_points3d.modules.KPConv import *
 from torch_points3d.core.base_conv.partial_dense import *
 from torch_points3d.applications.base_architectures.unet import UnwrappedUnetBasedModel
 from torch_points3d.core.common_modules.base_modules import MLP
