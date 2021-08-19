@@ -74,12 +74,13 @@ def SparseTensor(feats, coordinates, batch, device=torch.device("cpu")):
 
 
 class TorchSparseNonLinearityBase(torch.nn.Module):
-
     def __init__(module):
         super(TorchSparseNonLinearityBase, self).__init__()
         self.module = module
+
     def forward(self, input: TS.SparseTensor):
         return TS.nn.utils.fapply(input, self.module)
+
 
 def create_activation_function(activation: torch.nn.Module = torch.nn.ReLU()):
     """

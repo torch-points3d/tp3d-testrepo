@@ -64,10 +64,12 @@ def SparseTensor(feats, coordinates, batch, device=torch.device("cpu")):
     coords = torch.cat([batch.int(), coordinates.int()], -1)
     return ME.SparseTensor(features=feats, coordinates=coords, device=device)
 
+
 class MinkowskiNonlinearityBase(MinkowskiModuleBase):
     """
     taken from https://github.com/NVIDIA/MinkowskiEngine/blob/master/MinkowskiEngine/MinkowskiNonlinearity.py
     """
+
     def __init__(self, module):
         super(MinkowskiNonlinearityBase, self).__init__()
         self.module = module
@@ -91,6 +93,6 @@ class MinkowskiNonlinearityBase(MinkowskiModuleBase):
     def __repr__(self):
         return self.module.__class__.__name__ + "()"
 
+
 def create_activation_function(activation: torch.nn.Module = torch.nn.ReLU()):
     return MinkowskiNonlinearityBase(module=activation)
-
