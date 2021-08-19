@@ -1,9 +1,12 @@
+from typing import List, Dict, Any, Optional
 import torch
 
 import sys
 
 from torch_points3d.core.common_modules import Seq, Identity
 import torch_points3d.applications.modules.SparseConv3d.nn as snn
+from omegaconf import DictConfig
+from omegaconf import OmegaConf
 
 
 class ResBlock(torch.nn.Module):
@@ -22,26 +25,27 @@ class ResBlock(torch.nn.Module):
         Dimension of the spatial grid
     """
 
-    def __init__(self, input_nc, output_nc, convolution):
+    def __init__(self, input_nc: int, output_nc:int, convolution: Any, bn: Any, bn_args: DictConfig = OmegaConf.create(), activation: torch.nn.Module = torch.nn.ReLU()):
         super().__init__()
+        self.activation = snn.create_activation_function(activation)
         self.block = (
             Seq()
             .append(convolution(input_nc, output_nc, kernel_size=3, stride=1))
-            .append(snn.BatchNorm(output_nc))
-            .append(snn.ReLU())
+            .append(bn(output_nc, **bn_arg))
+            .append(self.activation)
             .append(convolution(output_nc, output_nc, kernel_size=3, stride=1))
-            .append(snn.BatchNorm(output_nc))
-            .append(snn.ReLU())
+            .append(bn(output_nc, **bn_args))
+            .append(self.activation)
         )
 
         if input_nc != output_nc:
             self.downsample = (
-                Seq().append(snn.Conv3d(input_nc, output_nc, kernel_size=1, stride=1)).append(snn.BatchNorm(output_nc))
+                Seq().append(convolution(input_nc, output_nc, kernel_size=1, stride=1)).append(bn(output_nc, **bn_args))
             )
         else:
             self.downsample = None
 
-    def forward(self, x):
+    def forward(self, x: snn.SparseTensor):
         out = self.block(x)
         if self.downsample:
             out += self.downsample(x)
@@ -55,14 +59,14 @@ class BottleneckBlock(torch.nn.Module):
     Bottleneck block with residual
     """
 
-    def __init__(self, input_nc, output_nc, convolution, reduction=4):
+    def __init__(self, input_nc: int, output_nc: int, convolution: Any, bn: Any, bn_args: DictConfig = OmegaConf.create(), reduction: int = 4, activation: torch.nn.Module = torch.nn.ReLU()):
         super().__init__()
-
+        self.activation = snn.create_activation_function(activation)
         self.block = (
             Seq()
-            .append(snn.Conv3d(input_nc, output_nc // reduction, kernel_size=1, stride=1))
-            .append(snn.BatchNorm(output_nc // reduction))
-            .append(snn.ReLU())
+            .append(convolution(input_nc, output_nc // reduction, kernel_size=1, stride=1))
+            .append(bn(output_nc // reduction, **bn_args))
+            .append(self.activation)
             .append(
                 convolution(
                     output_nc // reduction,
@@ -71,27 +75,27 @@ class BottleneckBlock(torch.nn.Module):
                     stride=1,
                 )
             )
-            .append(snn.BatchNorm(output_nc // reduction))
-            .append(snn.ReLU())
+            .append(bn(output_nc // reduction, **bn_args))
+            .append(self.activation)
             .append(
-                snn.Conv3d(
+                convolution(
                     output_nc // reduction,
                     output_nc,
                     kernel_size=1,
                 )
             )
-            .append(snn.BatchNorm(output_nc))
-            .append(snn.ReLU())
+            .append(bn(output_nc, **bn_args))
+            .append(self.activation)
         )
 
         if input_nc != output_nc:
             self.downsample = (
-                Seq().append(convolution(input_nc, output_nc, kernel_size=1, stride=1)).append(snn.BatchNorm(output_nc))
+                Seq().append(convolution(input_nc, output_nc, kernel_size=1, stride=1)).append(bn(output_nc, **bn_args))
             )
         else:
             self.downsample = None
 
-    def forward(self, x):
+    def forward(self, x: snn.SparseTensor):
         out = self.block(x)
         if self.downsample:
             out += self.downsample(x)
@@ -113,17 +117,25 @@ class ResNetDown(torch.nn.Module):
     """
 
     CONVOLUTION = "Conv3d"
+    BATCHNORM = "BatchNorm"
 
     def __init__(
         self,
-        down_conv_nn=[],
-        kernel_size=2,
-        dilation=1,
-        stride=2,
-        N=1,
-        block="ResBlock",
+        down_conv_nn: List[int] = [],
+        kernel_size: int = 2,
+        dilation: int = 1,
+        stride: int = 2,
+        N: int = 1,
+        block: str = "ResBlock",
+        activation: torch.nn.Module = torch.nn.ReLU(),
+        bn_args: Optional[DictConfig] = None,
         **kwargs,
     ):
+        assert len(down_conv_nn) == 2
+        if bn_args is None:
+            bn_args = OmegaConf.create()
+        else:
+            bn_args = bn_args.to_dict()
         block = getattr(_res_blocks, block)
         super().__init__()
         if stride > 1:
@@ -132,6 +144,7 @@ class ResNetDown(torch.nn.Module):
             conv1_output = down_conv_nn[1]
 
         conv = getattr(snn, self.CONVOLUTION)
+        bn = getattr(snn, self.BATCHNORM)
         self.conv_in = (
             Seq()
             .append(
@@ -143,19 +156,19 @@ class ResNetDown(torch.nn.Module):
                     dilation=dilation,
                 )
             )
-            .append(snn.BatchNorm(conv1_output))
-            .append(snn.ReLU())
+            .append(bn(conv1_output, **bn_args))
+            .append(snn.create_activation_function(activation))
         )
 
         if N > 0:
             self.blocks = Seq()
             for _ in range(N):
-                self.blocks.append(block(conv1_output, down_conv_nn[1], conv))
+                self.blocks.append(block(conv1_output, down_conv_nn[1], conv, bn=bn, bn_args=bn_args, activation=activation))
                 conv1_output = down_conv_nn[1]
         else:
             self.blocks = None
 
-    def forward(self, x):
+    def forward(self, x: snn.SparseTensor):
         out = self.conv_in(x)
         if self.blocks:
             out = self.blocks(out)
@@ -168,18 +181,20 @@ class ResNetUp(ResNetDown):
     """
 
     CONVOLUTION = "Conv3dTranspose"
-
-    def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, **kwargs):
+    def __init__(self, up_conv_nn: List = [], kernel_size: int = 2, dilation: int = 1, stride: int = 2, N:int = 1, block:str = "ResBlock", activation: torch.nn.Module =torch.nn.ReLU(), bn_args: Optional[DictConfig] = None, **kwargs):
         super().__init__(
             down_conv_nn=up_conv_nn,
             kernel_size=kernel_size,
             dilation=dilation,
             stride=stride,
             N=N,
+            activation=activation,
+            bn_args=bn_args,
+            block=block
             **kwargs,
         )
 
-    def forward(self, x, skip):
+    def forward(self, x: snn.SparseTensor, skip: Optional[snn.SparseTensor]):
         if skip is not None:
             inp = snn.cat(x, skip)
         else:

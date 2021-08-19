@@ -18,7 +18,7 @@ except:
         pass
 
 
-__all__ = ["cat", "Conv3d", "Conv3dTranspose", "ReLU", "SparseTensor", "BatchNorm"]
+__all__ = ["cat", "Conv3d", "Conv3dTranspose", "ReLU", "SparseTensor", "BatchNorm", "create_activation_function"]
 for val in __all__:
     exec(val + "=None")
 
