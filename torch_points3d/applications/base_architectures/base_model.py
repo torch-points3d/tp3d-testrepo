@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+
 # This is the base class of the Backbone/API models, that provides useful functions to use within these models
 class BaseModel(nn.Module):
 
